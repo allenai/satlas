@@ -1,0 +1,6 @@
+scipy
+numpy
+shapely
+scikit-image
+tqdm
+eyediagram
