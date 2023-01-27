@@ -1,5 +1,5 @@
-from multisat.util import geom
-from multisat.util import grid_index
+from satlas.util import geom
+from satlas.util import grid_index
 
 import math
 import numpy
