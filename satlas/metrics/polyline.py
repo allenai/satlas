@@ -42,8 +42,12 @@ def compare(job):
     with open(gt_fname, 'r') as f:
         gt = json.load(f)
 
-    with open(pred_fname, 'r') as f:
-        pred = json.load(f)
+    if os.path.exists(pred_fname):
+        with open(pred_fname, 'r') as f:
+            pred = json.load(f)
+    else:
+        print('warning: {} does not exist'.format(pred_fname))
+        pred = {}
 
     counts = {}
     for category in categories:

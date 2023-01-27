@@ -1,6 +1,7 @@
 import json
 import math
 import numpy as np
+import os
 import scipy.optimize
 
 from satlas.util import grid_index, geom
@@ -27,15 +28,24 @@ def compare(job):
 
     with open(gt_fname, 'r') as f:
         gt = json.load(f)
-    with open(pred_fname, 'r') as f:
-        pred = json.load(f)
+
+    if os.path.exists(pred_fname):
+        with open(pred_fname, 'r') as f:
+            pred = json.load(f)
+    else:
+        print('warning: {} does not exist'.format(pred_fname))
+        pred = {}
 
     counts = {}
 
     for feat_name, prop_name, prop_type in properties:
         if feat_name not in gt:
             continue
-        for gt_feature, pred_feature in zip(gt[feat_name], pred[feat_name]):
+
+        gt_features = gt[feat_name]
+        pred_features = pred.get(feat_name, [{}]*len(gt_features))
+
+        for gt_feature, pred_feature in zip(gt_features, pred_features):
             if prop_name not in gt_feature.get('Properties', {}):
                 continue
 
@@ -43,17 +53,21 @@ def compare(job):
             if k not in counts:
                 counts[k] = [0, 0]
 
+            gt_val = gt_feature['Properties'][prop_name]
+            pred_val = pred_feature.get('Properties', {}).get(prop_name, '0')
+
             if prop_type == 'category' or prop_type == 'classify':
-                if gt_feature['Properties'][prop_name] == pred_feature['Properties'].get(prop_name, 'invalid'):
+                if gt_val == pred_val:
                     correct = 1
                 else:
                     correct = 0
+                    if prop_name == 'road_type': print(gt_val, pred_val)
                 counts[k][0] += correct
                 counts[k][1] += 1
 
             elif prop_type == 'numeric':
-                gt_val = float(gt_feature['Properties'][prop_name])
-                pred_val = float(pred_feature['Properties'][prop_name])
+                gt_val = float(gt_val)
+                pred_val = float(pred_val)
                 epsilon = 0.01
                 percent_error = abs(gt_val - pred_val) / max(gt_val, epsilon)
                 accuracy = 1 - max(percent_error, 0)

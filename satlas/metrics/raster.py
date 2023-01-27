@@ -5,14 +5,14 @@ import skimage.io
 from satlas.util import grid_index, geom
 
 tasks = [
-    ['land_cover', 'segment', 11],
+    ['land_cover', 'segment', ['water', 'developed', 'tree', 'shrub', 'grass', 'crop', 'bare', 'snow', 'wetland', 'mangroves', 'moss']],
     ['dem', 'regress', None],
-    ['crop_type', 'segment', 16],
+    ['crop_type', 'segment', ['rice', 'grape', 'corn', 'sugarcane', 'tea', 'hop', 'wheat', 'soy', 'barley', 'oats', 'rye', 'cassava', 'potato', 'sunflower', 'asparagus', 'coffee']],
     ['tree_cover', 'regress', None],
-    ['water_event', 'segment', 2],
-    ['flood', 'segment', 2],
-    ['cloud', 'segment', 2],
-    ['wildfire', 'bin_segment', 2],
+    ['water_event', 'segment', ['background', 'water_event']],
+    ['flood', 'segment', ['background', 'flood']],
+    ['cloud', 'segment', ['background', 'cloud']],
+    ['wildfire', 'bin_segment', 2, ['fire_retardant', 'burned']],
 ]
 
 def compare(job):
@@ -31,7 +31,7 @@ def compare(job):
         if os.path.exists(pred_fname):
             pred_im = skimage.io.imread(pred_fname)
         else:
-            print('warning: missing prediction for {} at tile {}'.format(task_name, tile))
+            print('warning: missing prediction corresponding to {}'.format(gt_fname))
             pred_im = np.zeros((512, 512), dtype=np.uint8)
 
         if task_type == 'regress':
