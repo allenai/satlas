@@ -6,6 +6,18 @@ Satlas: Multi-Task Remote Sensing Dataset
 This repository includes documentation for the Satlas dataset, along with code to evaluate output accuracy and dataset loading examples.
 
 
+Download
+--------
+
+The NAIP images, Sentinel-2 images, and labels in Satlas can be downloaded from these respective URLs:
+
+- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-naip.zip
+- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-sentinel2.tar
+- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-labels.zip
+
+The current release of Satlas is an initial beta release and we may expand the images and improve the labels during February to April 2023.
+
+
 Dataset Structure
 -----------------
 
