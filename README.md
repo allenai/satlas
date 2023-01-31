@@ -1,7 +1,7 @@
 Satlas: Multi-Task Remote Sensing Dataset
 -----------------------------------------
 
-[[Project Website](https://satlas.allenai.org/) | [Arxiv Paper](https://arxiv.org/abs/2211.15660) | [Github](https://github.com/allenai/satlas/)]
+[[Project Website](https://satlas.allen.ai/) | [Arxiv Paper](https://arxiv.org/abs/2211.15660) | [Github](https://github.com/allenai/satlas/)]
 
 This repository includes documentation for the Satlas dataset, along with code to evaluate output accuracy and dataset loading examples.
 
