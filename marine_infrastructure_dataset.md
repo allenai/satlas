@@ -1,3 +1,5 @@
+Download URL: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-marine-infrastructure-v1.zip
+
 The marine infrastructure dataset contains labels for three classes:
 
 - Vessels
