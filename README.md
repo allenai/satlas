@@ -223,6 +223,6 @@ The output should be a new version of `vector.json` with the same features but w
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality raster
 
 
-### Visualization Examples
+### Example Visualization Code
 
-[See here.](satlas/to_dataset/README.md)
+[See here.](satlas/cmd/to_dataset/README.md)
