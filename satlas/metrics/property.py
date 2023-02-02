@@ -4,24 +4,8 @@ import numpy as np
 import os
 import scipy.optimize
 
+from satlas.tasks import property_tasks
 from satlas.util import grid_index, geom
-
-properties = [
-    ['wind_turbine', 'rotor_diameter', 'numeric'],
-    ['wind_turbine', 'power_mw', 'numeric'],
-    ['parking_lot', 'capacity', 'numeric'],
-    ['track', 'sport', 'category'],
-    ['road', 'road_type', 'category'],
-    ['road', 'lanes', 'numeric'],
-    ['road', 'max_speed', 'numeric'],
-    ['road', 'bridge', 'numeric'],
-    ['power_plant', 'plant_type', 'category'],
-    ['quarry', 'resource', 'category'],
-    ['park', 'park_type', 'category'],
-    ['park', 'sport', 'category'],
-    ['smoke', 'smoke', 'classify'],
-    ['snow', 'snow', 'classify']
-]
 
 def compare(job):
     gt_fname, pred_fname = job
@@ -38,7 +22,11 @@ def compare(job):
 
     counts = {}
 
-    for feat_name, prop_name, prop_type in properties:
+    for task in property_tasks:
+        feat_name = task['obj']
+        prop_name = task['property']
+        prop_type = task['type']
+
         if feat_name not in gt:
             continue
 
@@ -56,7 +44,7 @@ def compare(job):
             gt_val = gt_feature['Properties'][prop_name]
             pred_val = pred_feature.get('Properties', {}).get(prop_name, '0')
 
-            if prop_type == 'category' or prop_type == 'classify':
+            if prop_type == 'property_category' or prop_type == 'classify':
                 if gt_val == pred_val:
                     correct = 1
                 else:
@@ -65,7 +53,7 @@ def compare(job):
                 counts[k][0] += correct
                 counts[k][1] += 1
 
-            elif prop_type == 'numeric':
+            elif prop_type == 'property_numeric':
                 gt_val = float(gt_val)
                 pred_val = float(pred_val)
                 epsilon = 0.01

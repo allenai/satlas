@@ -17,6 +17,12 @@ The NAIP images, Sentinel-2 images, and labels in Satlas can be downloaded from 
 
 The current release of Satlas is an initial beta release and we may expand the images and improve the labels during February to April 2023.
 
+You can also download the ancillary datasets below.
+These are part of the broader Satlas project at AI2 but not part of the "Satlas dataset".
+Subsets of some of these datasets may appear in Satlas.
+
+- Marine Infrastructure (Vessels, Off-Shore Wind Turbines, Off-Shore Platforms): [[Documentation](marine_infrastructure_dataset.md) | [Download](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-marine-infrastructure-v1.zip)]
+
 
 Dataset Structure
 -----------------
@@ -215,3 +221,8 @@ The output should be a new version of `vector.json` with the same features but w
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality polyline
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality property
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality raster
+
+
+### Visualization Examples
+
+[See here.](satlas/to_dataset/README.md)

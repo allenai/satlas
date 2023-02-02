@@ -2,26 +2,20 @@ import numpy as np
 import os
 import skimage.io
 
+from satlas.tasks import raster_tasks
 from satlas.util import grid_index, geom
-
-tasks = [
-    ['land_cover', 'segment', ['water', 'developed', 'tree', 'shrub', 'grass', 'crop', 'bare', 'snow', 'wetland', 'mangroves', 'moss']],
-    ['dem', 'regress', None],
-    ['crop_type', 'segment', ['rice', 'grape', 'corn', 'sugarcane', 'tea', 'hop', 'wheat', 'soy', 'barley', 'oats', 'rye', 'cassava', 'potato', 'sunflower', 'asparagus', 'coffee']],
-    ['tree_cover', 'regress', None],
-    ['water_event', 'segment', ['background', 'water_event']],
-    ['flood', 'segment', ['background', 'flood']],
-    ['cloud', 'segment', ['background', 'cloud']],
-    ['wildfire', 'bin_segment', 2, ['fire_retardant', 'burned']],
-]
 
 def compare(job):
     gt_path, pred_path = job
     counts = {}
 
-    for task_name, task_type, num_classes in tasks:
-        gt_fname = os.path.join(gt_path, task_name+'.png')
-        pred_fname = os.path.join(pred_path, task_name+'.png')
+    for task in raster_tasks:
+        task_name = task['name']
+        task_id = task['id']
+        task_type = task['type']
+
+        gt_fname = os.path.join(gt_path, task_id+'.png')
+        pred_fname = os.path.join(pred_path, task_id+'.png')
 
         if not os.path.exists(gt_fname):
             continue
@@ -42,22 +36,25 @@ def compare(job):
 
         elif task_type == 'segment':
             mask = gt_im > 0
-            for cls_id in range(1, num_classes+1):
+            for cls_id, cls_name in enumerate(task['categories']):
+                if cls_name == 'background' or cls_name == 'invalid':
+                    continue
+
                 gt_bin = gt_im == cls_id
                 pred_bin = pred_im == cls_id
                 tp_im = (gt_bin) & (pred_bin) & mask
                 fp_im = (~gt_bin) & (pred_bin) & mask
                 fn_im = (gt_bin) & (~pred_bin) & mask
-                counts['{}_{}_f1'.format(task_name, cls_id)] = (np.count_nonzero(tp_im), np.count_nonzero(fp_im), np.count_nonzero(fn_im))
+                counts['{}_{}_f1'.format(task_name, cls_name)] = (np.count_nonzero(tp_im), np.count_nonzero(fp_im), np.count_nonzero(fn_im))
 
         elif task_type == 'bin_segment':
-            for cls_id in range(num_classes):
+            for cls_id, cls_name in enumerate(task['categories']):
                 gt_bin = gt_im & (1 << cls_id)
                 pred_bin = pred_im & (1 << cls_id)
                 tp_im = (gt_bin) & (pred_bin)
                 fp_im = (~gt_bin) & (pred_bin)
                 fn_im = (gt_bin) & (~pred_bin)
-                counts['{}_{}_f1'.format(task_name, cls_id)] = (np.count_nonzero(tp_im), np.count_nonzero(fp_im), np.count_nonzero(fn_im))
+                counts['{}_{}_f1'.format(task_name, cls_name)] = (np.count_nonzero(tp_im), np.count_nonzero(fp_im), np.count_nonzero(fn_im))
 
     return counts
 
