@@ -9,13 +9,35 @@ This repository includes documentation for the Satlas dataset, along with code t
 Download
 --------
 
+### Satlas Dataset
+
 The NAIP images, Sentinel-2 images, and labels in Satlas can be downloaded from these respective URLs:
 
 - https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-naip.zip
 - https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-sentinel2.tar
 - https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-labels.zip
 
-The current release of Satlas is an initial beta release and we may expand the images and improve the labels during February to April 2023.
+The current release of Satlas is an initial beta release.
+As of March 2023, we have expanded the dataset (v1) with more images at each labeled tile (8-12 Sentinel-2 images in 2022 and 3-5 NAIP images in 2011-2020), and it will be released by 1 June 2023.
+
+### Model Weights
+
+Pre-trained weights for single-image SatlasNet can be downloaded from these URLs:
+
+- High-resolution (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
+- Low-resolution (Sentinel-2): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
+
+The model code is not released yet but the Swin-v2-Base backbone can be restored for application to downstream tasks:
+
+    import torch
+    import torchvision
+    model = torchvision.models.swin_transformer.swin_v2_b()
+    full_state_dict = torch.load('satlas-model-v1-highres.pth')
+    swin_prefix = 'backbone.backbone.'
+    swin_state_dict = {k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)}
+    model.load_state_dict(swin_state_dict)
+
+### Ancillary Datasets
 
 You can also download the ancillary datasets below.
 These are part of the broader Satlas project at AI2 but not part of the "Satlas dataset".
