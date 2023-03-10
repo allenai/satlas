@@ -37,6 +37,12 @@ The model code is not released yet but the Swin-v2-Base backbone can be restored
     swin_state_dict = {k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)}
     model.load_state_dict(swin_state_dict)
 
+The channels should be in RGB order, with pixel values normalized to 0-1.
+
+- NAIP: remove the IR channel if any, and divide the 0-255 RGB values by 255.
+- Other high-resolution e.g. Google Earth: divide the 0-255 RGB values by 255.
+- Sentinel-2: use the TCI (true-color image) file and divide the 0-255 RGB values by 255.
+
 ### Ancillary Datasets
 
 You can also download the ancillary datasets below.
