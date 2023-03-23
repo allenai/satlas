@@ -11,14 +11,34 @@ Download
 
 ### Satlas Dataset
 
-The NAIP images, Sentinel-2 images, and labels in Satlas can be downloaded from these respective URLs:
+Satlas consists of Sentinel-2 images, NAIP images, corresponding labels, and metadata which can be downloaded as follows:
 
-- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-naip.zip
-- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-sentinel2.tar
-- https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v0-beta-labels.zip
+    cd satlas_root/
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-a.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-b.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel1.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2011.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2012.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2013.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2014.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2015.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2016.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2017.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2018.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2019.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2020.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-dynamic.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-static.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-metadata.tar
+    ls | grep tar | xargs -L 1 tar xvf
 
-The current release of Satlas is an initial beta release.
-As of March 2023, we have expanded the dataset (v1) with more images at each labeled tile (8-12 Sentinel-2 images in 2022 and 3-5 NAIP images in 2011-2020), and it will be released by 1 June 2023.
+Small versions of the NAIP and Sentinel-2 images are available:
+
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-small.tar
+    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-small.tar
+    ls | grep tar | xargs -L 1 tar xvf
+    ln -s sentinel2_small sentinel2
+    ln -s naip_small naip
 
 ### Model Weights
 
@@ -27,7 +47,7 @@ Pre-trained weights for single-image SatlasNet can be downloaded from these URLs
 - High-resolution (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
 - Low-resolution (Sentinel-2): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
 
-The model code is not released yet but the Swin-v2-Base backbone can be restored for application to downstream tasks:
+The Swin-v2-Base backbone can be restored for application to downstream tasks:
 
     import torch
     import torchvision
@@ -43,6 +63,11 @@ The channels should be in RGB order, with pixel values normalized to 0-1.
 - Other high-resolution e.g. Google Earth: divide the 0-255 RGB values by 255.
 - Sentinel-2: use the TCI (true-color image) file and divide the 0-255 RGB values by 255.
 
+Alternatively, it can be used with the model in this repository:
+
+    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old.txt --weights models/satlas-model-v1-highres.pth --details
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old.txt --weights models/satlas-model-v1-lowres.pth --details
+
 ### Ancillary Datasets
 
 You can also download the ancillary datasets below.
@@ -55,15 +80,16 @@ Subsets of some of these datasets may appear in Satlas.
 Dataset Structure
 -----------------
 
-Satlas is divided into train, validation, and test splits, but the train and test splits have further subdivisions:
+Satlas is divided into high-resolution and low-resolution image modes.
+Each image mode has its own train and test split, although dynamic labels have separate files defining how tiles are split than the slow-changing labels.
+The splits are defined by JSON files that contain list of (col, row) pairs:
 
-- train_gold contains more complete labels for 13 classes: chimney, fountain, gas_station, helipad, parking_garage, parking_lot, petroleum_well, power_substation, silo, storage_tank, toll_booth, water_tower, wind_turbine.
-- test_highres focuses evaluation on areas where high-resolution images are available.
-
-For each split, two folders contain the images and labels respectively, for example:
-
-- `satlas/train/`: contains images. `satlas/train/images/` contains Sentinel-2 images and `satlas/train/highres/` contains NAIP images.
-- `satlas/train_labels/`: contains labels.
+- satlas/metadata/train_lowres.json
+- satlas/metadata/test_lowres.json
+- satlas/metadata/train_highres.json
+- satlas/metadata/test_highres.json
+- satlas/metadata/train_event.json
+- satlas/metadata/test_event.json
 
 
 ### Tile System
@@ -75,29 +101,43 @@ The high-resolution images are stored at zoom level 17.
 
 ### Images
 
+For low-resolution image mode, there are:
+
+- Sentinel-2 images in `satlas/sentinel2/`
+- Sentinel-1 images in `satlas/sentinel1/`
+
+For high-resolution image mode, there are NAIP images in `satlas/naip/` which are stored at zoom level 17 instead of 13 so that the PNGs are still 512x512.
+
 The image directory structure looks like this:
 
-    satlas/train/
-        images/
-            000b0417499f43ffb8907b110d9793d6/
-                tci/
-                    1867_3287.png
-                    1867_3288.png
-                    ...
-                b05/
-                b06/
+    satlas/sentinel2/
+        S2A_MSIL1C_20160808T181452_N0204_R041_T12SVC_20160808T181447/
+            tci/
+                1867_3287.png
+                1867_3288.png
                 ...
-            000d5719cfbb4590aa9156fd49d69806/
+            b05/
+            b06/
+            ...
+        S2B_MSIL1C_20221230T180749_N0509_R041_T13UCR_20221230T195817/
+            ...
+        ...
+    satlas/naip/
+        m_2508008_nw_17_1_20151013/
+            tci/
+                36368_55726.png
                 ...
-            ...
-        highres/
-            ...
+            ir/
+                36368_55726.png
+                ...
+        ...
 
-Each folder at the third level contains a different remote sensing image, named with a random UUID like `000b0417499f43ffb8907b110d9793d6`.
+
+Each folder at the second level contains a different remote sensing image.
 
 The tci, b05, and other sub-folders contain different bands from the image. `tci` contains true-color image; Sentinel-2 includes [other bands](https://sentinels.copernicus.eu/web/sentinel/user-guides/sentinel-2-msi/resolutions/spatial) as well.
 
-So `satlas/train/images/abcdef/tci/1867_3287.png` is a 512x512 image corresponding to column 1867 and row 3287 in the grid, for the tci channel of image `abcdef`.
+So `satlas/sentinel2/ABC/tci/1867_3287.png` is a 512x512 image corresponding to column 1867 and row 3287 in the grid, for the tci channel of image `ABC`.
 `1867_3288.png` is the image at the next row down.
 
 
@@ -111,36 +151,48 @@ The `geo_to_mercator` and `mercator_to_geo` functions in `satlas.util` translate
 
 ### Labels
 
-The label directory structure looks like this:
+Satlas consists of slow-changing labels, which should correspond to the most recent image at each tile, and dynamic labels, which reference a specific image/time.
 
-    satlas/train_labels/
+The directory structure looks like this:
+
+    satlas/static/
         1434_3312/
-            label_0/
-            airplane_325/
-            coast_3376/
-            ...
+            vector.json
+            tree_cover.png
+            land_cover.png
         1434_3313/
+        ...
+    satlas/dynamic/
+        1434_3312/
+            airplane_325/
+                vector.json
+            coast_3376/
+                vector.json
+                water_event.png
+            ...
         ...
 
 Each folder at the second level contains labels for a different tile, e.g. `1434_3312` contains labels for the zoom 13 tile at column 1434 and row 3312.
 
-The `label_0`, `airplane_325`, and `coast_3376` folders contain labels for different validity periods (time ranges). The validity period is specified under the metadata key in `airplane_325/vector.json`:
+The `airplane_325` and `coast_3376` folders contain dynamic labels for different images. The image name and timestamp is specified under the metadata key in `airplane_325/vector.json`:
 
     {
         "metadata": {
-            "Start": "2014-08-04T23:00:00+00:00",
-            "End": "2014-08-05T01:00:00+00:00"
+            "Start": "2014-08-04T23:59:59+00:00",
+            "End": "2014-08-05T00:00:01+00:00",
+            "ImageUUID": "996e6f0f4f3f42838211caf73c4692f2",
+            "ImageName": "m_3211625_sw_11_1_20140805"
         },
         "airplane": [
             ...
         ]
     }
 
-This means we think any labels stored here are present in the world from 04 August 2014 23:00 to 05 August 2014 01:00.
+This means these labels correspond to the image at `satlas/naip/m_3211625_sw_11_1_20140805/`.
 
-Point, polygon, polyline, property, and classification labels are also stored in `vector.json`. For example:
+Point, polygon, polyline, property, and classification labels are stored in `vector.json`. For example:
 
-    1234_5678/label_0/vector.json
+    satlas/static/1234_5678/vector.json
     {
         "airplane": [{
             "Geometry": {
@@ -194,7 +246,7 @@ Classification labels are polygons covering the entire tile, and the category is
 
 Segmentation and regression labels are stored in auxiliary greyscale 512x512 image files.
 The task is specified by the image filename, e.g. `water_event.png` or `land_cover.png`.
-The tasks and categories are defined in `satlas/metrics/raster.py`.
+The tasks and categories are defined in `satlas/tasks.py`.
 
 For regression tasks, the value in the greyscale PNG at a pixel is proportional to the quantity (for tree cover, 0 is no trees and 200 is full tree cover; for digital elevation model, 0 is -20 m water depth and 255 is land).
 
@@ -213,14 +265,10 @@ If the category is not annotated at all, then it will omit the key in `vector.js
 
 Additional files in `satlas/metadata/` contain extra data.
 
-- `train.json`, `val.json`, `test.json`, `train_gold.json`, and `test_highres.json` enumerate the tiles assigned to each split. Note that `train.json` is a superset of `train_gold.json`, and `test.json` is a superset of `test_highres.json`.
-- `image_times_sentinel2.json` and `image_times_naip.json` contain the timestamp of images based on their UUIDs.
-
-
-Inference
----------
-
-The output format is essentially identical to the format of labels in Satlas. For each label folder like `labels/1434_3312/airplane_325/`, a corresponding output `outputs/1434_3312/airplane_325/` should be produced.
+- `train_highres.json`, `train_lowres.json`, `test_event.json`, `test_highres.json`, `train_lowres.json`, `test_event.json` enumerate the tiles assigned to each split.
+- `image_times.json` contains the timestamp of each image based on its name.
+- `test_highres_property.json` and `test_lowres_property.json` specify the subset of Satlas for evaluating properties. There are also `train_highres_property_1million.json` and `train_lowres_property_1million.json` which contain up to 1 million examples of each property to make the dataset size produced by `satlas.cmd.to_dataset.property`  more tractable, but all of the properties in the train split can be used for training if desired.
+- The various `good_images_X.json` files enumerate images that have few cloudy or missing (black) pixels.
 
 
 ### Predicting non-Property Labels
@@ -228,7 +276,7 @@ The output format is essentially identical to the format of labels in Satlas. Fo
 For predicting label types other than properties, the following data from the labels folder can be used:
 
 - Tile position (e.g. `1434_3312`)
-- Validity period (from `vector.json`)
+- Image name (from `vector.json`)
 - The subset of categories annotated in the label folder (must only be used for optimizing inference execution)
 - Label folder name (must only be used for creating identically named output folder)
 
@@ -244,13 +292,48 @@ The output should be a new version of `vector.json` with the same features but w
 
 ### Evaluation
 
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality point
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality polygon
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality polyline
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality property
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/test_highres_labels/ --pred_path path/to/outputs/ --modality raster
+The output format is essentially identical to the format of labels in Satlas. For each label folder like `static/1434_3312/` or `dynamic/1434_3312/airplane_325/`, a corresponding output `outputs/1434_3312/` or `outputs/1434_3312/airplane_325/` should be produced.
+
+    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality point --split path/to/satlas/metadata/test_highres.json --format static
+    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality polygon --split path/to/satlas/metadata/test_highres.json --format static
+    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality polyline --split path/to/satlas/metadata/test_highres.json --format static
+    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality property --split path/to/satlas/metadata/test_highres.json --format static
+    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality raster --split path/to/satlas/metadata/test_highres.json --format static
 
 
-### Example Visualization Code
+Training
+---------
 
-[See here.](satlas/cmd/to_dataset/README.md)
+### Prepare Datasets
+
+Convert the dataset format to one compatible with training code. It consists of pairs of image time series and subsets of labels under different modalities.
+
+    python -m satlas.cmd.to_dataset.detect --satlas_root satlas_root/ --out_path satlas_root/datasets/
+    python -m satlas.cmd.to_dataset.raster --satlas_root satlas_root/ --out_path satlas_root/datasets/
+    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/
+    python -m satlas.cmd.to_dataset.polyline_rasters --dataset_root satlas_root/datasets/
+
+Can then visualize these datasets:
+
+    python -m satlas.cmd.vis --path satlas_root/datasets/highres/polygon/ --task polygon --out_path ~/vis/
+
+### Train Model
+
+Compute weights for each example that balance based on inverse of category frequency:
+
+    python -m satlas.cmd.model.compute_bal_weights --dataset_path satlas_root/datasets/highres/ --out_path satlas_root/bal_weights/highres.json
+    python -m satlas.cmd.model.compute_bal_weights --dataset_path satlas_root/datasets/lowres/ --out_path satlas_root/bal_weights/lowres.json
+
+Then train the models:
+
+    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/highres_joint.txt --world_size 8
+    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/lowres_joint.txt --world_size 8
+
+## Infer and Evaluate Model
+
+    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --details
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint.txt --details
+
+With visualization:
+
+    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/

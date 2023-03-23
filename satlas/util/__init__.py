@@ -61,8 +61,8 @@ def decode_multiclass_binary(enc, num_classes):
         arr[:, :, cls_id] = (enc & (2**cls_id)) > 0
     return arr
 
-def load_window(base_dir, column, row, width, height, chip_size=512):
-    im = np.zeros((height, width, 3), dtype=np.uint8)
+def load_window(base_dir, column, row, width, height, chip_size=512, bands=3):
+    im = np.zeros((height, width, bands), dtype=np.uint8)
 
     # Load tiles one at a time.
     start_tile = (column//chip_size, row//chip_size)
@@ -74,6 +74,10 @@ def load_window(base_dir, column, row, width, height, chip_size=512):
                 continue
 
             cur_im = skimage.io.imread(fname)
+            if bands == 1 and len(cur_im.shape) == 2:
+                # Add channel dimension for greyscale images.
+                cur_im = cur_im[:, :, None]
+
             cur_col_off = chip_size*i
             cur_row_off = chip_size*j
 

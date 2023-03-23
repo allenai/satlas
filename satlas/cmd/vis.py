@@ -62,29 +62,34 @@ if 'colors' in task:
 else:
     colors = default_colors
 
-def process(image_id):
+def process(example_id):
+    example_dir = os.path.join(args.path, example_id)
+    image_dir = os.path.join(example_dir, 'images')
+
     # Find most recent image.
-    image_fnames = []
-    for fname in os.listdir(os.path.join(args.path, image_id)):
-        if not fname.startswith('image_'):
-            continue
-        image_fnames.append(fname)
-    image_fnames.sort()
-    image_fname = os.path.join(args.path, image_id, image_fnames[-1])
+    # Or use anchor image if provided.
+    image_ids = []
+    for image_id in os.listdir(image_dir):
+        if image_id.startswith('anchor_'):
+            image_ids = [image_id]
+            break
+        image_ids.append(image_id)
+    image_ids.sort()
+    image_fname = os.path.join(image_dir, image_id, 'tci.png')
 
     if task_type in ['property_numeric', 'property_category', 'classify']:
-        with open(os.path.join(args.path, image_id, 'gt.txt'), 'r') as f:
+        with open(os.path.join(example_dir, 'gt.txt'), 'r') as f:
             value = f.read().strip()
         shutil.copyfile(
             image_fname,
-            os.path.join(args.out_path, '{}_im_{}.png'.format(image_id, value)),
+            os.path.join(args.out_path, '{}_im_{}.png'.format(example_id, value)),
         )
         return
 
     # Create gt image.
     if task_type in ['point', 'polygon']:
         gt = skimage.io.imread(image_fname)
-        with open(os.path.join(args.path, image_id, 'gt.json'), 'r') as f:
+        with open(os.path.join(example_dir, 'gt.json'), 'r') as f:
             data = json.load(f)
 
         if task_type == 'point':
@@ -121,7 +126,7 @@ def process(image_id):
                 gt[mask] = color
 
     elif task_type in ['segment', 'bin_segment', 'regress']:
-        gt_raw = skimage.io.imread(os.path.join(args.path, image_id, 'gt.png'))
+        gt_raw = skimage.io.imread(os.path.join(example_dir, 'gt.png'))
 
         if task_type in ['segment', 'bin_segment']:
             gt = np.zeros((gt_raw.shape[0], gt_raw.shape[1], 3), dtype=np.uint8)
@@ -131,23 +136,23 @@ def process(image_id):
                     gt[gt_raw == category_idx] = color
                 else:
                     mask_value = 2**category_idx
-                    gt[gt_raw & mask_value] = color
+                    gt[(gt_raw & mask_value) > 0] = color
 
         elif task_type == 'regress':
             gt = gt_raw
 
     shutil.copyfile(
         image_fname,
-        os.path.join(args.out_path, '{}_im.png'.format(image_id)),
+        os.path.join(args.out_path, '{}_im.png'.format(example_id)),
     )
     skimage.io.imsave(
-        os.path.join(args.out_path, '{}_gt.png'.format(image_id)),
+        os.path.join(args.out_path, '{}_gt.png'.format(example_id)),
         gt,
         check_contrast=False,
     )
 
-image_ids = os.listdir(args.path)
+example_ids = os.listdir(args.path)
 p = multiprocessing.Pool(args.workers)
-for _ in tqdm.tqdm(p.imap_unordered(process, image_ids), total=len(image_ids)):
+for _ in tqdm.tqdm(p.imap_unordered(process, example_ids), total=len(example_ids)):
     pass
 p.close()

@@ -1,6 +1,10 @@
 scipy
-numpy
-shapely
-scikit-image
-tqdm
 eyediagram
+numpy
+rasterio
+scikit-image
+shapely
+tqdm
+torch
+torchvision
+torchaudio

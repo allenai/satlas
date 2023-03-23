@@ -74,8 +74,6 @@ def compare(job):
             gt.get(category, []),
             pred.get(category, []),
         )
-        if category == 'airplane':
-            print(gt_fname, pred_fname, tp, fp, fn)
         counts[category] = (tp, fp, fn)
 
     return counts
