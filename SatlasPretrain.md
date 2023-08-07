@@ -1,7 +1,7 @@
 SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (ICCV 2023)
 ----------------------------------------------------------------------------------------
 
-[[SatlasPretrain Webpage](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Satlas Website](https://satlas.allen.ai/)]
+[[SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Satlas Website](https://satlas.allen.ai/)]
 
 SatlasPretrain is a large-scale pre-training dataset for remote sensing image understanding.
 

@@ -1,9 +1,10 @@
 Satlas: Open AI-Generated Geospatial Data
 -----------------------------------------
 
-[[Website](https://satlas.allen.ai/) | [SatlasPretrain](https://satlas-pretrain.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
+[[Satlas Website](https://satlas.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
 
 Satlas aims to provide open AI-generated geospatial data that is highly accurate, available globally, and updated on a frequent (monthly) basis.
+
 For an introduction to Satlas, see https://satlas.allen.ai/.
 
 This repository includes:
@@ -12,7 +13,7 @@ This repository includes:
 - Training and inference code.
 - [Download the AI-generated geospatial data](GeospatialDataProducts.md) for offline analysis.
 
-For Satlas super-resolution code, see https://github.com/allenai/satlas-super-resolution
+Satlas super-resolution code is in [another repository](https://github.com/allenai/satlas-super-resolution).
 
 
 Overview
