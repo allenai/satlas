@@ -370,7 +370,7 @@ def get_invalid_target(task):
         }
 
 def load_segment_target(spec, fname):
-    task = tasks[spec['Name']]
+    task = spec['Task']
 
     if not os.path.exists(fname):
         return get_invalid_target(task)
@@ -382,7 +382,7 @@ def load_segment_target(spec, fname):
     if 'ClassMap' in spec:
         new_im = np.zeros(im.shape, dtype='uint8')
         for cls_name, new_idx in spec['ClassMap'].items():
-            old_idx = tasks[spec['Name']]['categories'].index(cls_name)
+            old_idx = task['categories'].index(cls_name)
             new_im[im == old_idx] = new_idx
         im = new_im
 
@@ -396,7 +396,7 @@ def load_segment_target(spec, fname):
     }
 
 def load_bin_segment_target(spec, fname):
-    task = tasks[spec['Name']]
+    task = spec['Task']
     is_rgb = task.get('RGB', False)
 
     # Convert 0-255 mask to binary segmentation labels.
@@ -434,7 +434,7 @@ def load_bin_segment_target(spec, fname):
     if 'ClassMap' in spec:
         new_im = np.zeros(im.shape, dtype='uint8')
         for cls_name, new_idx in spec['ClassMap'].items():
-            old_idx = tasks[spec['Name']]['categories'].index(cls_name)
+            old_idx = task['categories'].index(cls_name)
             new_im[old_idx, :, :] = 0
             new_im[new_idx, :, :] |= im[old_idx, :, :]
         im = new_im
@@ -452,7 +452,7 @@ def load_regress_target(spec, fname):
     return load_segment_target(spec, fname=fname)
 
 def load_detect_target(spec, fname):
-    task = tasks[spec['Name']]
+    task = spec['Task']
     categories = task['categories']
 
     boxes = []
@@ -492,7 +492,7 @@ def load_detect_target(spec, fname):
     return target
 
 def load_instance_target(spec, fname):
-    task = tasks[spec['Name']]
+    task = spec['Task']
     categories = task['categories']
 
     valid = 1
@@ -571,7 +571,7 @@ def load_classification_target(spec, fname):
     '''
     Returns the target dict for a classification task.
     '''
-    task = tasks[spec['Name']]
+    task = spec['Task']
     categories = task['categories']
     label = 0
     valid = 0
@@ -591,7 +591,7 @@ def load_multi_label_classification_target(spec, fname):
     '''
     Returns the target dict for a multi-label classification task.
     '''
-    task = tasks[spec['Name']]
+    task = spec['Task']
     n_categories = len(task['categories'])
 
     target = {
@@ -635,11 +635,10 @@ class Dataset(object):
         task_transforms=None, # Different transforms for particular tasks.
         phase=None, # Specifies Train/Val/Test for the purpose of looking for split filenames.
     ):
-
         self.task_specs = task_specs
         self.transforms = transforms
         self.channels = channels
-        self.tasks = [tasks[spec['Name']] for spec in self.task_specs]
+        self.tasks = [spec['Task'] for spec in self.task_specs]
         self.num_images = num_images
         self.task_transforms = task_transforms
 
@@ -732,8 +731,22 @@ class Dataset(object):
                     fname = prefix+'.png'
                 elif os.path.exists(prefix+'.jpg'):
                     fname = prefix+'.jpg'
+                else:
+                    print('warning: no existing file at {}'.format(prefix))
+                    continue
 
-                im = skimage.io.imread(fname)
+                try:
+                    im = skimage.io.imread(fname)
+                except Exception as e:
+                    print('warning: error reading from {}: {}'.format(fname, e))
+                    continue
+
+                # Some bands are stored at lower resolution, like 20+ m/pixel Sentinel-2 bands.
+                # So here we dynamically resize it to the expected chip_size.
+                if im.shape[0] < chip_size:
+                    factor = chip_size // im.shape[0]
+                    im = im.repeat(axis=0, repeats=factor).repeat(axis=1, repeats=factor)
+
                 if len(im.shape) == 3 and im.shape[2] == 3:
                     cur_image[:, :, channel_idx:channel_idx+3] = im
                 else:
@@ -751,7 +764,7 @@ class Dataset(object):
         targets = []
         for task_idx, spec in enumerate(self.task_specs):
             task_name = spec['Name']
-            task = tasks[task_name]
+            task = spec['Task']
             task_type = task['type']
 
             if task_name != option.task_spec['Name']:

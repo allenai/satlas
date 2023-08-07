@@ -40,6 +40,13 @@ def main(args):
     if ('max_tiles' in args) and args.max_tiles:
         config['TestMaxTiles'] = args.max_tiles
 
+    # Set Task info if needed.
+    for spec in config['Tasks']:
+        if 'Task' not in spec:
+            spec['Task'] = satlas.model.dataset.tasks[spec['Name']]
+    if 'ChipSize' in config:
+        satlas.model.dataset.chip_size = config['ChipSize']
+
     channels = config.get('Channels', ['tci', 'fake', 'fake'])
     batch_size = config['BatchSize']
     vis_dir = config.get('VisDir', None)

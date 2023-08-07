@@ -787,8 +787,7 @@ class Model(torch.nn.Module):
 
         self.heads = []
         for task_spec, head_config in zip(self.task_specs, self.model_config['Heads']):
-            task_name = task_spec['Name']
-            task = satlas.model.dataset.tasks[task_name]
+            task = task_spec['Task']
             head = heads[head_config['Name']](backbone_channels, head_config, task)
             self.heads.append(head)
         self.heads = torch.nn.ModuleList(self.heads)

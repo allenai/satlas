@@ -146,6 +146,8 @@ def process(job):
                             height=cur_img_size,
                             bands=num_channels,
                         )
+                        if im.shape[2] == 1:
+                            im = im[:, :, 0]
                         skimage.io.imsave(
                             os.path.join(dst_img_dir, '{}.png'.format(band)),
                             im,

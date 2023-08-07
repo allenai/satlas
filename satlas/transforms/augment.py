@@ -9,7 +9,7 @@ class CropFlip(object):
     def __init__(self, cfg, my_cfg):
         self.my_cfg = my_cfg
         task_specs = cfg['Tasks']
-        self.tasks = [satlas.model.dataset.tasks[spec['Name']] for spec in task_specs]
+        self.tasks = [spec['Task'] for spec in task_specs]
 
     def __call__(self, data, targets):
         flip_horizontal = self.my_cfg.get('HorizontalFlip', False) and random.random() < 0.5
@@ -148,7 +148,7 @@ class Pad(object):
         self.mode = my_cfg.get('Mode', 'topleft')
 
         task_specs = cfg['Tasks']
-        self.tasks = [satlas.model.dataset.tasks[spec['Name']] for spec in task_specs]
+        self.tasks = [spec['Task'] for spec in task_specs]
 
     def __call__(self, data, targets):
         # Crop either by fixed amount or random amount depending on config.
@@ -293,7 +293,7 @@ class Resize(object):
     def __init__(self, cfg, my_cfg):
         self.my_cfg = my_cfg
         task_specs = cfg['Tasks']
-        self.tasks = [satlas.model.dataset.tasks[spec['Name']] for spec in task_specs]
+        self.tasks = [spec['Task'] for spec in task_specs]
 
     def apply_one(self, data, targets, resize_to=None):
         assert data.shape[1] == data.shape[2] # currently we only support square image since we rescale both dimensions by same factor

@@ -631,7 +631,7 @@ def evaluate(config, model, device, loader, half_enabled=False, vis_dir=None, pr
         evaluators = []
         for task_idx, spec in enumerate(config['Tasks']):
             task_name = spec['Name']
-            task = satlas.model.dataset.tasks[task_name]
+            task = spec['Task']
             task['name'] = task_name # Since we only pass the dict, not the name, to score functions.
             task_type = task['type']
             metric = spec.get('Metric', 'accuracy')
@@ -662,7 +662,7 @@ def evaluate(config, model, device, loader, half_enabled=False, vis_dir=None, pr
                 all_losses[task_idx].append(losses[task_idx].item())
 
                 task_name = spec['Name']
-                task = satlas.model.dataset.tasks[task_name]
+                task = spec['Task']
                 task_type = task['type']
 
                 if selected_task and selected_task != task_name:

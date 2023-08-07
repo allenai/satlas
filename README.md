@@ -1,339 +1,185 @@
-Satlas: Multi-Task Remote Sensing Dataset
+Satlas: Open AI-Generated Geospatial Data
 -----------------------------------------
 
-[[Project Website](https://satlas.allen.ai/) | [Arxiv Paper](https://arxiv.org/abs/2211.15660) | [Github](https://github.com/allenai/satlas/)]
+[[Website](https://satlas.allen.ai/) | [SatlasPretrain](https://satlas-pretrain.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
 
-This repository includes documentation for the Satlas dataset, along with code to evaluate output accuracy and dataset loading examples.
+Satlas aims to provide open AI-generated geospatial data that is highly accurate, available globally, and updated on a frequent (monthly) basis.
+For an introduction to Satlas, see https://satlas.allen.ai/.
+
+This repository includes:
+- Download the training data, including [SatlasPretrain](SatlasPretrain.md), a large-scale remote sensing dataset.
+- Download the pre-trained model weights.
+- Training and inference code.
+- [Download the AI-generated geospatial data](GeospatialDataProducts.md) for offline analysis.
+
+For Satlas super-resolution code, see https://github.com/allenai/satlas-super-resolution
 
 
-Download
+Overview
 --------
 
-### Satlas Dataset
+The AI-generated geospatial data in Satlas is computed by applying deep learning models on [Sentinel-2 satellite imagery](https://sentinel.esa.int/web/sentinel/missions/sentinel-2), which is open imagery released by the European Space Agency.
 
-Satlas consists of Sentinel-2 images, NAIP images, corresponding labels, and metadata which can be downloaded as follows:
-
-    cd satlas_root/
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-a.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-b.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel1.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2011.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2012.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2013.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2014.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2015.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2016.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2017.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2018.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2019.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2020.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-dynamic.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-static.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-metadata.tar
-    ls | grep tar | xargs -L 1 tar xvf
-
-Small versions of the NAIP and Sentinel-2 images are available:
-
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-small.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-small.tar
-    ls | grep tar | xargs -L 1 tar xvf
-    ln -s sentinel2_small sentinel2
-    ln -s naip_small naip
-
-### Model Weights
-
-Pre-trained weights for single-image SatlasNet can be downloaded from these URLs:
-
-- High-resolution (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
-- Low-resolution (Sentinel-2): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
-
-The Swin-v2-Base backbone can be restored for application to downstream tasks:
-
-    import torch
-    import torchvision
-    model = torchvision.models.swin_transformer.swin_v2_b()
-    full_state_dict = torch.load('satlas-model-v1-highres.pth')
-    swin_prefix = 'backbone.backbone.'
-    swin_state_dict = {k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)}
-    model.load_state_dict(swin_state_dict)
-
-The channels should be in RGB order, with pixel values normalized to 0-1.
-
-- NAIP: remove the IR channel if any, and divide the 0-255 RGB values by 255.
-- Other high-resolution e.g. Google Earth: divide the 0-255 RGB values by 255.
-- Sentinel-2: use the TCI (true-color image) file and divide the 0-255 RGB values by 255.
-
-Alternatively, it can be used with the model in this repository:
-
-    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old.txt --weights models/satlas-model-v1-highres.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old.txt --weights models/satlas-model-v1-lowres.pth --details
-
-### Ancillary Datasets
-
-You can also download the ancillary datasets below.
-These are part of the broader Satlas project at AI2 but not part of the "Satlas dataset".
-Subsets of some of these datasets may appear in Satlas.
-
-- Marine Infrastructure (Vessels, Off-Shore Wind Turbines, Off-Shore Platforms): [[Documentation](marine_infrastructure_dataset.md) | [Download](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-marine-infrastructure-v1.zip)]
+The images are relatively low-resolution, at 10 m/pixel, but captured frequently---the bulk of Earth's land mass is imaged weekly by Sentinel-2. We retrieve these images and update the geospatial data products on a monthly basis.
 
 
-Dataset Structure
------------------
+Training Data and Models
+------------------------
 
-Satlas is divided into high-resolution and low-resolution image modes.
-Each image mode has its own train and test split, although dynamic labels have separate files defining how tiles are split than the slow-changing labels.
-The splits are defined by JSON files that contain list of (col, row) pairs:
+The models in Satlas are developed in four phases:
 
-- satlas/metadata/train_lowres.json
-- satlas/metadata/test_lowres.json
-- satlas/metadata/train_highres.json
-- satlas/metadata/test_highres.json
-- satlas/metadata/train_event.json
-- satlas/metadata/test_event.json
+1. Pre-train models on SatlasPretrain.
+2. Annotate high-quality task-specific training labels.
+3. Fine-tune models on the task-specific labels.
+4. Test the models on the whole world, and iterate on the training data until the models provide high accuracy.
 
+### SatlasPretrain
 
-### Tile System
+SatlasPretrain is a large-scale remote sensing image understanding dataset appearing in ICCV 2023.
+It contains 302M labels under 137 categories, collected through a combination of crowdsourced annotation and processing existing data sources like OpenStreetMap.
 
-Images and labels are both projected to [Web-Mercator](https://en.wikipedia.org/wiki/Web_Mercator_projection) and stored at zoom level 13.
-This means the world is divided into a grid with 2^13 rows and 2^13 columns.
-The high-resolution images are stored at zoom level 17.
+Pre-training on SatlasPretrain helps to improve the downstream performance of our models when fine-tuning on the smaller sets of task-specific labels.
 
+See https://satlas-pretrain.allen.ai/ for more information on SatlasPretrain, or [download the dataset](SatlasPretrain.md).
 
-### Images
+### Task-Specific Labels and Model Weights
 
-For low-resolution image mode, there are:
+The fine-tuning training data and model weights can be downloaded at https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar.
 
-- Sentinel-2 images in `satlas/sentinel2/`
-- Sentinel-1 images in `satlas/sentinel1/`
+This download link contains an archive with four folders:
+- `base_models/` contains models trained on SatlasPretrain that are used as initialization for fine-tuning.
+- `labels/` contains the fine-tuning training data.
+- `models/` contains the trained model weights.
+- `splits/` contains metadata about the training and validation splits.
 
-For high-resolution image mode, there are NAIP images in `satlas/naip/` which are stored at zoom level 17 instead of 13 so that the PNGs are still 512x512.
+Each training dataset is structured like this:
 
-The image directory structure looks like this:
-
-    satlas/sentinel2/
-        S2A_MSIL1C_20160808T181452_N0204_R041_T12SVC_20160808T181447/
-            tci/
-                1867_3287.png
-                1867_3288.png
-                ...
-            b05/
-            b06/
-            ...
-        S2B_MSIL1C_20221230T180749_N0509_R041_T13UCR_20221230T195817/
-            ...
-        ...
-    satlas/naip/
-        m_2508008_nw_17_1_20151013/
-            tci/
-                36368_55726.png
-                ...
-            ir/
-                36368_55726.png
+    labels/solar_farm/
+        4267_2839/
+            gt.png
+            images/
+                fp03-2020-12/
+                    tci.png
+                    b05.png
+                    b06.png
+                    b07.png
+                    b08.png
+                    b11.png
+                    b12.png
+                fp03-2021-01/
+                    ...
                 ...
         ...
 
+Each folder like `4267_2839/` contains a different training example, which corresponds to a particular geographic location. The `images/` subfolder contains images captured at different times at that location. The current datasets all use [Sentinel-2 images](https://sentinel.esa.int/web/sentinel/missions/sentinel-2). `tci.png` contains B02, B03, and B04. The 10 m/pixel and 20 m/pixel bands (except B8A) are used as input and included in the training data, while the 60 m/pixel bands are not used.
 
-Each folder at the second level contains a different remote sensing image.
+The Sentinel-2 bands were normalized to 8-bit PNGs as follows:
+- `tci`: taken from the TCI JPEG2000 image provided by ESA. This is already an 8-bit RGB product.
+- Other bands: the raw image scenes from ESA are 16-bit products. We convert to greyscale 8-bit PNGs: `clip(band/32, 0, 255)`.
 
-The tci, b05, and other sub-folders contain different bands from the image. `tci` contains true-color image; Sentinel-2 includes [other bands](https://sentinels.copernicus.eu/web/sentinel/user-guides/sentinel-2-msi/resolutions/spatial) as well.
+For segmentation (solar farm) and regression (tree cover) labels, `gt.png` contains a greyscale mask. For segmentation, the pixel value indicates the class ID. For regression, the pixel value indicates the ground truth value.
 
-So `satlas/sentinel2/ABC/tci/1867_3287.png` is a 512x512 image corresponding to column 1867 and row 3287 in the grid, for the tci channel of image `ABC`.
-`1867_3288.png` is the image at the next row down.
+For object detection labels (on-shore wind turbines and marine infrastructure), `gt.json` contains bounding box labels like this:
+
+    [
+        [14, 467, 54, 507, "wind_turbine"],
+        [53, 473, 93, 513, "wind_turbine"]
+    ]
+
+Each box is in the form `[start_col, start_row, end_col, end_row, category_name]`. The current tasks are annotated as points so the boxes are all the same size, the center point is the actual label and can be easily derived `[(start_col + end_col) / 2, (start_row + end_row) / 2]` if desired.
 
 
-### Coordinates
+AI-Generated Geospatial Data
+----------------------------
 
-The `geo_to_mercator` and `mercator_to_geo` functions in `satlas.util` translate from tile coordinates like (1867, 3287) to longitude-latitude coordinates like (33.4681, -97.9541).
+The AI-generated geospatial data in Satlas [can be downloaded here](GeospatialDataProducts.md) for offline analysis.
+
+We have evaluated the accuracy of each model in terms of their precision and recall on each continent. [View the accuracy report here.](AccuracyReport.md)
+
+
+Using the Code
+--------------
+
+Here we describe using the code for the task-specific training data. For using the code for pre-training models on SatlasPretrain, [click here](SatlasPretrain.md).
+
+### Training and Validation
+
+First clone this repository and extract the training data to a subfolder called `satlas_explorer_datasets`:
+
+    git clone https://github.com/allenai/satlas
+    cd satlas
+    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
+    tar xvf satlas_explorer_datasets_2023-07-24.tar
+
+Run training if desired (this will overwrite the models extracted from the tar download):
+
+    python -m satlas.cmd.model.train --config_path configs/satlas_explorer_wind_turbine.txt
+    python -m satlas.cmd.model.train --config_path configs/satlas_explorer_solar_farm.txt
+    python -m satlas.cmd.model.train --config_path configs/satlas_explorer_marine_infrastructure.txt
+    python -m satlas.cmd.model.train --config_path configs/satlas_explorer_tree_cover.txt
+
+Compute precision and recall stats on the validation data:
+
+    python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_wind_turbine.txt --details
+    python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_solar_farm.txt --details
+    python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_marine_infrastructure.txt --details
+    python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_tree_cover.txt --details
+
+Inference on Custom Images
+--------------------------
+
+### High-Resolution Inference Example
+
+In this example we will obtain high-resolution satellite or aerial imagery and apply a single-image high-resolution model on it.
+
+We will assume you're using [satlas-model-v1-highres.pth](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth) (pre-trained on SatlasPretrain).
+
+First, obtain the code and the model:
+
+    git clone https://github.com/allenai/satlas
+    mkdir models
+    wget -O models/satlas-model-v1-highres.pth https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
+
+Second, find the longitude and latitude of the location you're interested in, and convert it to a Web-Mercator tile at zoom 16-18. You can use [Satlas](https://satlas.allen.ai/map) and hover your mouse over a point of interest to get its longitude and latitude. To convert to tile using Python:
 
     import satlas.util
-    satlas.util.mercator_to_geo((1867, 3287), pixels=1, zoom=13)
+    longitude = -122.333
+    latitude = 47.646
+    print(satlas.util.geo_to_mercator((longitude, latitude), pixels=1, zoom=18))
+
+Get a high-resolution image that you want to apply the model on, e.g. you could download an image from Google Maps by visiting a URL like this:
+
+    http://mt1.google.com/vt?lyrs=s&x={x}&y={y}&z={z}
+    Example: http://mt1.google.com/vt?lyrs=s&x=41991&y=91508&z=18
+
+We'll assume the image is saved as `image.png`. Now we will load the model and apply the model, and extract its building predictions:
+
+    TODO
 
 
-### Labels
+### Sentinel-2 Inference Example
 
-Satlas consists of slow-changing labels, which should correspond to the most recent image at each tile, and dynamic labels, which reference a specific image/time.
+In this example we will download three Sentinel-2 scenes of the same location and apply a multi-image low-resolution model on it.
 
-The directory structure looks like this:
+We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [satlas-model-v1-lowres-multi.pth](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-multi.pth) (the SatlasPretrain model) instead.
 
-    satlas/static/
-        1434_3312/
-            vector.json
-            tree_cover.png
-            land_cover.png
-        1434_3313/
-        ...
-    satlas/dynamic/
-        1434_3312/
-            airplane_325/
-                vector.json
-            coast_3376/
-                vector.json
-                water_event.png
-            ...
-        ...
+First obtain the code and the model:
 
-Each folder at the second level contains labels for a different tile, e.g. `1434_3312` contains labels for the zoom 13 tile at column 1434 and row 3312.
+    git clone https://github.com/allenai/satlas
+    cd satlas
+    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
+    tar xvf satlas_explorer_datasets_2023-07-24.tar
 
-The `airplane_325` and `coast_3376` folders contain dynamic labels for different images. The image name and timestamp is specified under the metadata key in `airplane_325/vector.json`:
+Use [scihub.copernicus.eu](https://scihub.copernicus.eu/dhus/) to download three Sentinel-2 scenes of the same location.
 
-    {
-        "metadata": {
-            "Start": "2014-08-04T23:59:59+00:00",
-            "End": "2014-08-05T00:00:01+00:00",
-            "ImageUUID": "996e6f0f4f3f42838211caf73c4692f2",
-            "ImageName": "m_3211625_sw_11_1_20140805"
-        },
-        "airplane": [
-            ...
-        ]
-    }
+1. Create an account using the profile icon in the top-right.
+2. Zoom in on a location of interest, and use the rectangle tool (middle right, the square with dotted lines icon) to draw a rectangle.
+3. Open the filters (three horizontal bars icon) in the top-left, check "Mission: Sentinel-2", and select S2MSI1C for product type. Optionally limit cloud cover to "[0 TO 20]" or similar. Optionally add start/end times under Sensing Period.
+4. Press the search button. You should see a list of Sentinel-2 scenes, and when you hover over one of them it should highlight the scene on the map.
+5. Find three scenes covering the same geographic extent (based on what's highlighted in the map when you hover over that item in the product list) and download them.
 
-This means these labels correspond to the image at `satlas/naip/m_3211625_sw_11_1_20140805/`.
+Use gdal to merge the bands across scenes:
 
-Point, polygon, polyline, property, and classification labels are stored in `vector.json`. For example:
+    TODO
 
-    satlas/static/1234_5678/vector.json
-    {
-        "airplane": [{
-            "Geometry": {
-                "Type": "point",
-                "Point": [454, 401]
-            },
-            "Properties": {}
-        }],
-
-        "power_plant": [{
-            "Geometry": {
-                "Type": "polygon",
-                "Polygon": [[[6197, 6210], [6151, 6284], [6242, 6341], [6260, 6312], [6288, 6268], [6197, 6210]]]
-            },
-            "Properties": {"plant_type": "gas"}
-        }],
-
-        "road": [{
-            "Geometry": {
-                "Type": "polyline",
-                "Polyline": [[7287, 789], [7281, 729], [7280, 716], [7277, 690], [7267, 581], [7256, 466], [7242, 312], [7206, -45], [7149, -628]]
-            },
-            "Properties": {"road_type": "residential"}
-        }],
-
-        "smoke": [{
-            "Geometry": {
-                "Type": "polygon",
-                "Polygon": [[[0, 0], [8192, 0], [8192, 8192], [0, 8192]]]
-            },
-            "Properties": {"smoke": 0}
-        }]
-    }
-
-The `vector.json` labels contain geometries that describe coordinates within the tile.
-We define an 8192x8192 coordinate system within each tile.
-These coordinates can be converted to longitude-latitude coordinates like this:
-
-    import satlas.util
-    tile = (1234, 5678)
-    point = (454, 401)
-    satlas.util.mercator_to_geo((tile[0]*8192 + point[0], tile[1]*8192 + point[1]), pixels=8192, zoom=13)
-
-Points contain a single center column and row.
-
-Polygons contain a sequence of rings, each of which is a sequence of points. The first ring is the exterior of the polygon, and any subsequent rings are interior holes.
-
-Polylines just contain a sequence of points.
-
-Classification labels are polygons covering the entire tile, and the category is stored in the property (the category is 0 for smoke above).
-
-Segmentation and regression labels are stored in auxiliary greyscale 512x512 image files.
-The task is specified by the image filename, e.g. `water_event.png` or `land_cover.png`.
-The tasks and categories are defined in `satlas/tasks.py`.
-
-For regression tasks, the value in the greyscale PNG at a pixel is proportional to the quantity (for tree cover, 0 is no trees and 200 is full tree cover; for digital elevation model, 0 is -20 m water depth and 255 is land).
-
-For segmentation tasks, 0 represents invalid pixels, 1 represents the first cateogry in `satlas/metrics/raster.py`, and so on.
-
-For binary segmentation tasks, the rightmost bit in the greyscale value corresponds to the first category, and so on.
-
-Note that only a subset of categories are annotated in each label folder. Oftentimes categories will be annotated but have no instances present in the tile and/or time range, in which case they will appear in `vector.json` like this:
-
-    "power_substation": [],
-
-If the category is not annotated at all, then it will omit the key in `vector.json` entirely (or, for segmentation and regression labels, omit the PNG image like no `land_cover.png`).
-
-
-### Other Files
-
-Additional files in `satlas/metadata/` contain extra data.
-
-- `train_highres.json`, `train_lowres.json`, `test_event.json`, `test_highres.json`, `train_lowres.json`, `test_event.json` enumerate the tiles assigned to each split.
-- `image_times.json` contains the timestamp of each image based on its name.
-- `test_highres_property.json` and `test_lowres_property.json` specify the subset of Satlas for evaluating properties. There are also `train_highres_property_1million.json` and `train_lowres_property_1million.json` which contain up to 1 million examples of each property to make the dataset size produced by `satlas.cmd.to_dataset.property`  more tractable, but all of the properties in the train split can be used for training if desired.
-- The various `good_images_X.json` files enumerate images that have few cloudy or missing (black) pixels.
-
-
-### Predicting non-Property Labels
-
-For predicting label types other than properties, the following data from the labels folder can be used:
-
-- Tile position (e.g. `1434_3312`)
-- Image name (from `vector.json`)
-- The subset of categories annotated in the label folder (must only be used for optimizing inference execution)
-- Label folder name (must only be used for creating identically named output folder)
-
-
-### Predicting Property and Classification Labels
-
-For property and classification labels, the entirety of `vector.json` except the property values can also be used.
-
-Thus, the model can use the coordinates of points, polygons, and polylines like `power_plant` or `road`, and optimize execution based on the property keys (e.g. don't predict road width if it's not labeled for a certain road).
-
-The output should be a new version of `vector.json` with the same features but with the property values filled in based on the model predictions.
-
-
-### Evaluation
-
-The output format is essentially identical to the format of labels in Satlas. For each label folder like `static/1434_3312/` or `dynamic/1434_3312/airplane_325/`, a corresponding output `outputs/1434_3312/` or `outputs/1434_3312/airplane_325/` should be produced.
-
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality point --split path/to/satlas/metadata/test_highres.json --format static
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality polygon --split path/to/satlas/metadata/test_highres.json --format static
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality polyline --split path/to/satlas/metadata/test_highres.json --format static
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality property --split path/to/satlas/metadata/test_highres.json --format static
-    python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality raster --split path/to/satlas/metadata/test_highres.json --format static
-
-
-Training
----------
-
-### Prepare Datasets
-
-Convert the dataset format to one compatible with training code. It consists of pairs of image time series and subsets of labels under different modalities.
-
-    python -m satlas.cmd.to_dataset.detect --satlas_root satlas_root/ --out_path satlas_root/datasets/
-    python -m satlas.cmd.to_dataset.raster --satlas_root satlas_root/ --out_path satlas_root/datasets/
-    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/
-    python -m satlas.cmd.to_dataset.polyline_rasters --dataset_root satlas_root/datasets/
-
-Can then visualize these datasets:
-
-    python -m satlas.cmd.vis --path satlas_root/datasets/highres/polygon/ --task polygon --out_path ~/vis/
-
-### Train Model
-
-Compute weights for each example that balance based on inverse of category frequency:
-
-    python -m satlas.cmd.model.compute_bal_weights --dataset_path satlas_root/datasets/highres/ --out_path satlas_root/bal_weights/highres.json
-    python -m satlas.cmd.model.compute_bal_weights --dataset_path satlas_root/datasets/lowres/ --out_path satlas_root/bal_weights/lowres.json
-
-Then train the models:
-
-    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/highres_joint.txt --world_size 8
-    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/lowres_joint.txt --world_size 8
-
-## Infer and Evaluate Model
-
-    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint.txt --details
-
-With visualization:
-
-    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/
+TODO

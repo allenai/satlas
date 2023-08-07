@@ -87,10 +87,10 @@ def process(job):
                     feat_id = '{}_{}_{}'.format(absolute_coords[0], absolute_coords[1], category)
 
                     tile_bounds = (
-                        np.clip(min([p[0] for p in exterior])*factor//8192, 0, factor),
-                        np.clip(min([p[1] for p in exterior])*factor//8192, 0, factor),
-                        np.clip(max([p[0] for p in exterior])*factor//8192+1, 0, factor+1),
-                        np.clip(max([p[1] for p in exterior])*factor//8192+1, 0, factor+1),
+                        np.clip(min([p[0] for p in exterior])*factor//8192, 0, factor-1),
+                        np.clip(min([p[1] for p in exterior])*factor//8192, 0, factor-1),
+                        np.clip(max([p[0] for p in exterior])*factor//8192+1, 0, factor),
+                        np.clip(max([p[1] for p in exterior])*factor//8192+1, 0, factor),
                     )
 
                     for off_col in range(tile_bounds[0], tile_bounds[2]):

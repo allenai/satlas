@@ -1,0 +1,80 @@
+{
+    "Channels": ["tci", "fake", "fake", "b05", "b06", "b07", "b08", "b11", "b12"],
+    "BatchSize": 16,
+    "ValBatchSize": 4,
+
+    "TrainTransforms": [{
+        "Name": "CropFlip",
+        "HorizontalFlip": true,
+        "VerticalFlip": true,
+        "CropMin": 384,
+        "CropMax": 512
+    }, {
+        "Name": "Resize",
+        "ResizeMin": 448,
+        "ResizeMax": 448
+    }],
+
+    "ValMaxTiles": 4096,
+    "TestMaxTiles": 4096,
+
+    "NumImages": 3,
+
+    "RestorePath": "satlas_explorer_datasets/base_models/lowres_joint_multi_bands.pth",
+    "Freeze": ["module.backbone.", "module.intermediates."],
+    "Unfreeze": 65536,
+    "WarmupExamples": 65536,
+    "WarmupDelay": 65536,
+
+    "SavePath": "satlas_explorer_datasets/models/tree_cover/",
+    "NumEpochs": 10000,
+    "Model": {
+        "Name": "multihead4",
+        "Backbone": {
+            "Name": "aggregation",
+            "ImageChannels": 9,
+            "AggregationOp": "max",
+            "Groups": [[0, 1, 2]],
+            "Backbone": {
+                "Name": "swin",
+                "Arch": "swin_v2_b",
+                "Pretrained": true
+            }
+        },
+        "Intermediates": [{
+            "Name": "fpn"
+        }, {
+            "Name": "upsample"
+        }],
+        "Heads": [{
+            "Name": "simple",
+            "Loss": "l1"
+        }]
+    },
+    "Optimizer": {
+        "Name": "adam",
+        "InitialLR": 0.0001
+    },
+    "Scheduler": {
+        "Name": "plateau",
+        "Factor": 0.5,
+        "Patience": 1,
+        "Cooldown": 10,
+        "MinLR": 1e-6
+    },
+    "Half": false,
+    "SummaryExamples": 32768,
+    "Tasks": [{
+        "Name": "tree_cover",
+        "Task": {
+            "mode": "space",
+            "type": "regress",
+            "BackgroundInvalid": true
+        },
+        "Metric": "l1",
+        "LabelDir": "satlas_explorer_datasets/labels/",
+        "TrainSplit": "satlas_explorer_datasets/splits/tree_cover_train.json",
+        "ValSplit": "satlas_explorer_datasets/splits/tree_cover_val.json",
+        "TestSplit": "satlas_explorer_datasets/splits/tree_cover_val.json"
+    }]
+}

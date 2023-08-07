@@ -1,7 +1,7 @@
 {
     "Channels": ["tci", "fake", "fake"],
-    "BatchSize": 16,
-    "ValBatchSize": 2,
+    "BatchSize": 32,
+    "ValBatchSize": 8,
 
     "TrainTransforms": [{
         "Name": "CropFlip",
@@ -39,7 +39,7 @@
             "Name": "aggregation",
             "ImageChannels": 3,
             "Groups": [[0, 1, 2, 3, 4, 5, 6, 7]],
-            "AggregationOp": "conv1d",
+            "AggregationOp": "max",
             "Backbone": {
                 "Name": "swin",
                 "Arch": "swin_v2_b",
@@ -62,8 +62,6 @@
         }, {
             "Name": "simple"
         }, {
-            "Name": "simple"
-        }, {
             "Name": "simple",
             "Loss": "l1"
         }, {
@@ -72,22 +70,22 @@
             "Name": "simple",
             "Loss": "l1"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "classify",
+            "Name": "simple",
             "Loss": "cross_entropy"
         }, {
             "Name": "simple"
@@ -95,12 +93,6 @@
             "Name": "frcnn",
             "UseLayers": [1, 2, 3, 4],
             "AnchorSizes": [[32], [64], [128], [256]]
-        }, {
-            "Name": "classify",
-            "Loss": "cross_entropy"
-        }, {
-            "Name": "classify",
-            "Loss": "cross_entropy"
         }]
     },
     "Optimizer": {
@@ -139,13 +131,6 @@
         "ClassMask": ["wind_turbine", "lighthouse", "mineshaft", "aerialway_pylon", "helipad", "communications_tower", "petroleum_well", "water_tower", "power_tower", "offshore_wind_turbine", "offshore_platform"]
     }, {
         "Name": "land_cover",
-        "Metric": "f1",
-        "LabelDir": "satlas_root/datasets/lowres/",
-        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
-        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
-        "TestSplit": "satlas_root/metadata/test_lowres.json"
-    }, {
-        "Name": "polyline_bin_segment",
         "Metric": "f1",
         "LabelDir": "satlas_root/datasets/lowres/",
         "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
@@ -254,20 +239,6 @@
     }, {
         "Name": "vessel",
         "Metric": "f1",
-        "LabelDir": "satlas_root/datasets/lowres/",
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
-    }, {
-        "Name": "smoke",
-        "Metric": "accuracy",
-        "LabelDir": "satlas_root/datasets/lowres/",
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
-    }, {
-        "Name": "snow",
-        "Metric": "accuracy",
         "LabelDir": "satlas_root/datasets/lowres/",
         "TrainSplit": "satlas_root/metadata/train_event_train.json",
         "ValSplit": "satlas_root/metadata/train_event_val.json",

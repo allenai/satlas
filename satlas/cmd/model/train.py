@@ -39,6 +39,13 @@ def main(args, config):
     batch_size = config['BatchSize'] // args.world_size
     val_batch_size = config.get('ValBatchSize', config['BatchSize'])
 
+    # Set Task info if needed.
+    for spec in config['Tasks']:
+        if 'Task' not in spec:
+            spec['Task'] = satlas.model.dataset.tasks[spec['Name']]
+    if 'ChipSize' in config:
+        satlas.model.dataset.chip_size = config['ChipSize']
+
     train_transforms = satlas.transforms.get_transform(config, config.get('TrainTransforms', [{
         'Name': 'CropFlip',
         'HorizontalFlip': True,
