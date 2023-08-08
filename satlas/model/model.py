@@ -834,8 +834,7 @@ class Model(torch.nn.Module):
                 outputs.append(cur_outputs)
                 losses.append(cur_loss)
             else:
-                cur_targets = [target[task_idx] for target in targets]
-                cur_outputs, _ = head(image_list, features, cur_targets)
+                cur_outputs, _ = head(image_list, features)
                 outputs.append(cur_outputs)
 
         if len(losses) > 0:

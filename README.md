@@ -1,9 +1,7 @@
 Satlas: Open AI-Generated Geospatial Data
 -----------------------------------------
 
-[[Satlas Website](https://satlas.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
-
-Satlas aims to provide open AI-generated geospatial data that is highly accurate, available globally, and updated on a frequent (monthly) basis.
+[Satlas](https://satlas.allen.ai/) aims to provide open AI-generated geospatial data that is highly accurate, available globally, and updated on a frequent (monthly) basis.
 
 For an introduction to Satlas, see https://satlas.allen.ai/.
 
@@ -126,61 +124,6 @@ Compute precision and recall stats on the validation data:
     python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_marine_infrastructure.txt --details
     python -m satlas.cmd.model.infer --config_path configs/satlas_explorer_tree_cover.txt --details
 
-Inference on Custom Images
---------------------------
+### Inference on Custom Images
 
-### High-Resolution Inference Example
-
-In this example we will obtain high-resolution satellite or aerial imagery and apply a single-image high-resolution model on it.
-
-We will assume you're using [satlas-model-v1-highres.pth](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth) (pre-trained on SatlasPretrain).
-
-First, obtain the code and the model:
-
-    git clone https://github.com/allenai/satlas
-    mkdir models
-    wget -O models/satlas-model-v1-highres.pth https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
-
-Second, find the longitude and latitude of the location you're interested in, and convert it to a Web-Mercator tile at zoom 16-18. You can use [Satlas](https://satlas.allen.ai/map) and hover your mouse over a point of interest to get its longitude and latitude. To convert to tile using Python:
-
-    import satlas.util
-    longitude = -122.333
-    latitude = 47.646
-    print(satlas.util.geo_to_mercator((longitude, latitude), pixels=1, zoom=18))
-
-Get a high-resolution image that you want to apply the model on, e.g. you could download an image from Google Maps by visiting a URL like this:
-
-    http://mt1.google.com/vt?lyrs=s&x={x}&y={y}&z={z}
-    Example: http://mt1.google.com/vt?lyrs=s&x=41991&y=91508&z=18
-
-We'll assume the image is saved as `image.png`. Now we will load the model and apply the model, and extract its building predictions:
-
-    TODO
-
-
-### Sentinel-2 Inference Example
-
-In this example we will download three Sentinel-2 scenes of the same location and apply a multi-image low-resolution model on it.
-
-We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [satlas-model-v1-lowres-multi.pth](https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-multi.pth) (the SatlasPretrain model) instead.
-
-First obtain the code and the model:
-
-    git clone https://github.com/allenai/satlas
-    cd satlas
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
-    tar xvf satlas_explorer_datasets_2023-07-24.tar
-
-Use [scihub.copernicus.eu](https://scihub.copernicus.eu/dhus/) to download three Sentinel-2 scenes of the same location.
-
-1. Create an account using the profile icon in the top-right.
-2. Zoom in on a location of interest, and use the rectangle tool (middle right, the square with dotted lines icon) to draw a rectangle.
-3. Open the filters (three horizontal bars icon) in the top-left, check "Mission: Sentinel-2", and select S2MSI1C for product type. Optionally limit cloud cover to "[0 TO 20]" or similar. Optionally add start/end times under Sensing Period.
-4. Press the search button. You should see a list of Sentinel-2 scenes, and when you hover over one of them it should highlight the scene on the map.
-5. Find three scenes covering the same geographic extent (based on what's highlighted in the map when you hover over that item in the product list) and download them.
-
-Use gdal to merge the bands across scenes:
-
-    TODO
-
-TODO
+[See guide on applying Satlas/SatlasPretrain models on custom images.](CustomInference.md)

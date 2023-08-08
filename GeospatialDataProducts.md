@@ -1,4 +1,4 @@
-[[Website](https://satlas.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
+[[Satlas Website](https://satlas.allen.ai/) | [Github](https://github.com/allenai/satlas/)]
 
 ## Geospatial Data
 

@@ -97,7 +97,7 @@ The multi-band models for Sentinel-2 input 9 channels, with the non-TCI channels
 - TCI (this is three channels, RGB)
 - B05, B06, B07, B08, B11, B12
 
-For a detailed guide on applying the models on custom images, [see here](README.md#inference-on-custom-images).
+For a detailed guide on applying the models on custom images, [see here](CustomInference.md).
 
 
 Dataset Structure
