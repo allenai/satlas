@@ -50,60 +50,38 @@ Small versions of the NAIP and Sentinel-2 images are available. These can be use
 Weights for SatlasNet models pre-trained on SatlasPretrain can be downloaded from these URLs:
 
 - High-resolution, single-image (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
-- High-resolution, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres-multi.pth TODO
-- Low-resolution, single-image (Sentinel-2): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
-- Low-resolution, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-multi.pth TODO
-- Low-resolution, multi-band, single-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band.pth TODO
-- Low-resolution, multi-band, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band-multi.pth TODO
+- High-resolution, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres-multi.pth
+- Sentinel-2, single-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
+- Sentinel-2, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-multi.pth
+- Sentinel-2, multi-band, single-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band.pth
+- Sentinel-2, multi-band, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band-multi.pth
 
-The above models use Swin-v2-Base backbone. SatlasNet variants with Resnet backbone are available too:
+These documents are useful for using the models:
 
-- High-resolution, single-image, Resnet-50: TBD
-- High-resolution, multi-image, Resnet-50: TBD
-- Low-resolution, single-image, Resnet-50: TBD
-- Low-resolution, multi-image, Resnet-50: TBD
-- Low-resolution, single-image, multi-bandResnet-152: TBD
--
+- [Normalization.md](Normalization.md#sentinel-2-images) documents how images should be normalized for input to the models.
+- [See an example of applying the model and visualizing its outputs.](CustomInference.md#sentinel-2-inference-example)
+- If you plan to fine-tune the backbone for downstream tasks, [see the example on loading the backbone and extracting feature maps.](CustomInference.md#extracting-representations-example)
 
-The Swin-v2-Base backbone can be restored for application to downstream tasks:
+The models can also be used to compute outputs and stats on the SatlasPretrain validation set:
 
-    import torch
-    import torchvision
-    model = torchvision.models.swin_transformer.swin_v2_b()
-    full_state_dict = torch.load('satlas-model-v1-highres.pth')
-    swin_prefix = 'backbone.backbone.'
-    swin_state_dict = {k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)}
-    model.load_state_dict(swin_state_dict)
-
-The channels should be in RGB order, with pixel values normalized to 0-1.
-
-- NAIP: remove the IR channel if any, and divide the 0-255 RGB values by 255.
-- Other high-resolution e.g. Google Earth: divide the 0-255 RGB values by 255.
-- Sentinel-2: use the TCI (true-color image) file and divide the 0-255 RGB values by 255.
-
-Alternatively, it can be used with the code in this repository:
-
-    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old.txt --weights models/satlas-model-v1-highres.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old_multi.txt --weights models/satlas-model-v1-highres-multi.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old.txt --weights models/satlas-model-v1-lowres.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_multi.txt --weights models/satlas-model-v1-lowres-multi.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band.txt --weights models/satlas-model-v1-lowres-band.pth --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band_multi.txt --weights models/satlas-model-v1-lowres-band-multi.pth --details
+    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old.txt --weights models/satlas-model-v1-highres.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/highres_joint_old_multi.txt --weights models/satlas-model-v1-highres-multi.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old.txt --weights models/satlas-model-v1-lowres.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_multi.txt --weights models/satlas-model-v1-lowres-multi.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band.txt --weights models/satlas-model-v1-lowres-band.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band_multi.txt --weights models/satlas-model-v1-lowres-band-multi.pth --details --vis_dir vis/
 
 The multi-image models are geared towards making predictions about static objects, using multiple image captures of the same location for added robustness.
 Features maps from the Swin backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. During training, 4 images for high-res and 8 images for low-res are used.
+See [ModelArchitecture.md](ModelArchitecture.md) for more details.
 
-The multi-band models for Sentinel-2 input 9 channels, with the non-TCI channels normalized from the 16-bit source data by dividing by 8160 and clipping to 0-1. The channels are ordered as follows:
-- TCI (this is three channels, RGB)
-- B05, B06, B07, B08, B11, B12
-
-For a detailed guide on applying the models on custom images, [see here](CustomInference.md).
+The multi-band models for Sentinel-2 input 9 channels. See [Normalization.md](Normalization.md#sentinel-2-images) for more details.
 
 
 Dataset Structure
 -----------------
 
-Satlas is divided into high-resolution and low-resolution image modes.
+SatlasPretrain is divided into high-resolution and low-resolution image modes.
 Each image mode has its own train and test split, although dynamic labels have separate files defining how tiles are split than the slow-changing labels.
 The splits are defined by JSON files that contain list of (col, row) pairs:
 
@@ -333,12 +311,17 @@ Convert the dataset format to one compatible with training code. It consists of 
 
     python -m satlas.cmd.to_dataset.detect --satlas_root satlas_root/ --out_path satlas_root/datasets/
     python -m satlas.cmd.to_dataset.raster --satlas_root satlas_root/ --out_path satlas_root/datasets/
-    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/
     python -m satlas.cmd.to_dataset.polyline_rasters --dataset_root satlas_root/datasets/
+    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/ --ids satlas_root/metadata/train_lowres_property_100k.json
+    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/ --ids satlas_root/metadata/train_highres_property_100k.json
+    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/ --ids satlas_root/metadata/test_lowres_property.json
+    python -m satlas.cmd.to_dataset.property --satlas_root satlas_root/ --out_path satlas_root/datasets/ --ids satlas_root/metadata/test_highres_property.json
 
 Can then visualize these datasets:
 
     python -m satlas.cmd.vis --path satlas_root/datasets/highres/polygon/ --task polygon --out_path ~/vis/
+
+The format of these datasets is detailed in [DatasetSpec.md](DatasetSpec.md).
 
 ### Train Model
 

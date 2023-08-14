@@ -19,25 +19,25 @@ def main(args):
         config = json.load(f)
 
     # Override config with command-line arguments.
-    if ('vis_dir' in args) and args.vis_dir is not None:
+    if args.vis_dir is not None:
         config['VisDir'] = args.vis_dir
-    if ('probs_dir' in args) and args.probs_dir is not None:
+    if args.probs_dir is not None:
         config['ProbsDir'] = args.probs_dir
-    if ('out_dir' in args) and args.out_dir is not None:
+    if args.out_dir is not None:
         config['OutDir'] = args.out_dir
-    if ('split' in args) and args.split is not None:
+    if args.split is not None:
         for spec in config['Tasks']:
             spec['TestSplit'] = args.split
-    if ('image_list' in args) and args.image_list is not None:
+    if args.image_list is not None:
         for spec in config['Tasks']:
             spec['ImageList'] = args.image_list
-    if ('task' in args) and args.task is not None:
+    if args.task is not None:
         config['EvaluateTask'] = args.task
-    if ('batch_size' in args) and args.batch_size:
+    if args.batch_size:
         config['BatchSize'] = args.batch_size
-    if ('num_images' in args) and args.num_images:
+    if args.num_images:
         config['NumImages'] = args.num_images
-    if ('max_tiles' in args) and args.max_tiles:
+    if args.max_tiles:
         config['TestMaxTiles'] = args.max_tiles
 
     # Set Task info if needed.

@@ -72,7 +72,6 @@
             "type": "bin_segment",
             "categories": ["solar_farm"],
             "colors": [
-                [0, 0, 0],
                 [255, 255, 0]
             ]
         },

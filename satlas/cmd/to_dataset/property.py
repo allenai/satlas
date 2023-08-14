@@ -1,4 +1,5 @@
 import argparse
+import cv2
 import datetime
 import json
 import multiprocessing
@@ -148,10 +149,19 @@ def process(job):
                         )
                         if im.shape[2] == 1:
                             im = im[:, :, 0]
-                        skimage.io.imsave(
+                        else:
+                            im = im[:, :, (2, 1, 0)]
+                        success = cv2.imwrite(
                             os.path.join(dst_img_dir, '{}.png'.format(band)),
                             im,
+                            [int(cv2.IMWRITE_PNG_COMPRESSION),5],
                         )
+                        if not success:
+                            raise Exception('bad cv2')
+                        '''skimage.io.imsave(
+                            os.path.join(dst_img_dir, '{}.png'.format(band)),
+                            im,
+                        )'''
 
 jobs = []
 print('populate static jobs')

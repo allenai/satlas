@@ -80,8 +80,6 @@
             "Name": "simple",
             "Loss": "cross_entropy"
         }, {
-            "Name": "simple"
-        }, {
             "Name": "frcnn",
             "UseLayers": [1, 2, 3, 4],
             "AnchorSizes": [[32], [64], [128], [256]]
@@ -221,13 +219,6 @@
         "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
         "ValSplit": "satlas_root/metadata/train_lowres_val.json",
         "TestSplit": "satlas_root/metadata/test_lowres.json"
-    }, {
-        "Name": "wildfire",
-        "Metric": "f1",
-        "LabelDir": "satlas_root/datasets/lowres/",
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
     }, {
         "Name": "vessel",
         "Metric": "f1",

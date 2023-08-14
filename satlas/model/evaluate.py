@@ -610,6 +610,219 @@ def polygonize_masks(masks, boxes):
 
     return polygons
 
+# Convert segmentation class map to colors.
+def segmentation_mask_to_color(task, label_im, gt=None):
+    if task['type'] == 'segment':
+        vis = np.zeros((label_im.shape[0], label_im.shape[1], 3), dtype='uint8')
+        for cls, color in enumerate(task['colors']):
+            vis[label_im == cls] = color
+
+        if task.get('BackgroundInvalid', False) and gt:
+            # Mask out pixels in label_im that are background in the ground truth labels.
+            vis[gt == 0] = task['colors'][0]
+
+    elif task['type'] == 'bin_segment':
+        if label_im.dtype != bool:
+            label_im = label_im > 0.5
+
+        vis = np.zeros((label_im.shape[1], label_im.shape[2], 3), dtype='uint8')
+        for cls, color in enumerate(task['colors']):
+            vis[label_im[cls, :, :]] = color
+
+    return vis
+
+def visualize_outputs(task, image, outputs, targets=None, vis_dir=None, out_dir=None, evaluator_params=None, save_prefix='out'):
+    task_type = task['type']
+
+    if task_type == 'segment':
+        if evaluator_params:
+            # Use user-provided score thresholds for each class.
+            # If multiple classes have probability exceeding threshold at a pixel,
+            # the pixel will end up colored based on the last class.
+            pred_probs = outputs.cpu().numpy()
+            pred_cls = np.zeros(pred_probs.shape[1:3], dtype=np.uint8)
+            for cls_id, threshold in enumerate(evaluator_params):
+                pred_cls[pred_probs[cls_id, :, :] > threshold] = cls_id
+        else:
+            pred_cls = outputs.argmax(dim=0).cpu().numpy()
+
+        if vis_dir:
+            output = segmentation_mask_to_color(task, pred_cls)
+            skimage.io.imsave(os.path.join(vis_dir, '{}_im.png'.format(save_prefix)), image)
+            skimage.io.imsave(os.path.join(vis_dir, '{}_out.png'.format(save_prefix)), output)
+            if targets:
+                gt = segmentation_mask_to_color(task, targets['im'].numpy())
+                skimage.io.imsave(os.path.join(vis_dir, '{}_gt.png'.format(save_prefix)), gt)
+
+        if out_dir:
+            skimage.io.imsave(os.path.join(out_dir, '{}.png'.format(save_prefix)), pred_cls.astype(np.uint8))
+
+    elif task_type == 'bin_segment':
+        cur_outputs = outputs.cpu().numpy()
+        if evaluator_params:
+            cur_outputs_bin = np.stack([
+                cur_outputs[channel_idx, :, :] > evaluator_params[channel_idx]
+                for channel_idx in range(cur_outputs.shape[0])
+            ], axis=0)
+        else:
+            cur_outputs_bin = cur_outputs > 0.5
+
+        if vis_dir:
+            output = segmentation_mask_to_color(task, cur_outputs_bin)
+            skimage.io.imsave(os.path.join(vis_dir, '{}_im.png'.format(save_prefix)), image)
+            skimage.io.imsave(os.path.join(vis_dir, '{}_out.png'.format(save_prefix)), output)
+            if targets:
+                gt = segmentation_mask_to_color(task, targets['im'].numpy() > 0.5)
+                skimage.io.imsave(os.path.join(vis_dir, '{}_gt.png'.format(save_prefix)), gt)
+
+        if out_dir:
+            enc = satlas.util.encode_multiclass_binary(cur_outputs_bin.transpose(1, 2, 0))
+            np.save(os.path.join(out_dir, '{}.npy'.format(save_prefix)), enc)
+
+    elif task_type == 'regress':
+        output = np.clip(outputs.cpu().numpy(), 0, 255).astype(np.uint8)
+
+        if vis_dir:
+            skimage.io.imsave(os.path.join(vis_dir, '{}_im.png'.format(save_prefix)), image)
+            skimage.io.imsave(os.path.join(vis_dir, '{}_out.png'.format(save_prefix)), output)
+            if targets:
+                gt = targets['im'].numpy()
+                skimage.io.imsave(os.path.join(vis_dir, '{}_gt.png'.format(save_prefix)), gt)
+
+        if out_dir:
+            skimage.io.imsave(os.path.join(out_dir, '{}.png'.format(save_prefix)), output)
+
+    elif task_type == 'detect':
+        output_boxes = outputs['boxes'].long().cpu().numpy()
+        output_scores = outputs['scores'].cpu().numpy()
+        output_categories = outputs['labels'].cpu().numpy()
+
+        if evaluator_params:
+            output_score_thresholds = np.array([evaluator_params[category_id] for category_id in output_categories], dtype=np.float32)
+            wanted = output_scores >= output_score_thresholds
+
+            output_boxes = output_boxes[wanted, :]
+            output_scores = output_scores[wanted]
+            output_categories = output_categories[wanted]
+
+        if vis_dir:
+            def get_color(category_id):
+                if 'colors' in task:
+                    return task['colors'][category_id]
+                return [255, 255, 0]
+
+            output_im = image.copy()
+
+            for box_idx, box in enumerate(output_boxes):
+                color = get_color(outputs['labels'][box_idx].item())
+                left = satlas.util.clip(box[0], 0, output_im.shape[1])
+                top = satlas.util.clip(box[1], 0, output_im.shape[0])
+                right = satlas.util.clip(box[2], 0, output_im.shape[1])
+                bottom = satlas.util.clip(box[3], 0, output_im.shape[0])
+                output_im[top:bottom, left:left+2, :] = color
+                output_im[top:bottom, right-2:right, :] = color
+                output_im[top:top+2, left:right, :] = color
+                output_im[bottom-2:bottom, left:right, :] = color
+            skimage.io.imsave(os.path.join(vis_dir, '{}_out.png'.format(save_prefix)), output_im)
+
+            if targets:
+                gt_boxes = targets['boxes'].long().numpy()
+                gt_im = image.copy()
+                for box_idx, box in enumerate(gt_boxes):
+                    color = get_color(targets['labels'][box_idx].item())
+                    left = satlas.util.clip(box[0], 0, gt_im.shape[1])
+                    top = satlas.util.clip(box[1], 0, gt_im.shape[0])
+                    right = satlas.util.clip(box[2], 0, gt_im.shape[1])
+                    bottom = satlas.util.clip(box[3], 0, gt_im.shape[0])
+                    gt_im[top:bottom, left:left+2, :] = color
+                    gt_im[top:bottom, right-2:right, :] = color
+                    gt_im[top:top+2, left:right, :] = color
+                    gt_im[bottom-2:bottom, left:right, :] = color
+                skimage.io.imsave(os.path.join(vis_dir, '{}_gt.png'.format(save_prefix)), gt_im)
+
+        if out_dir:
+            output_data = [(
+                int(box[0]),
+                int(box[1]),
+                int(box[2]),
+                int(box[3]),
+                task['categories'][output_categories[i]],
+                float(output_scores[i]),
+            ) for i, box in enumerate(output_boxes)]
+
+            with open(os.path.join(out_dir, '{}.json'.format(save_prefix)), 'w') as f:
+                json.dump(output_data, f)
+
+    elif task_type == 'instance':
+        output_boxes = outputs['boxes'].long().cpu().numpy()
+        output_scores = outputs['scores'].cpu().numpy()
+        output_categories = outputs['labels'].cpu().numpy()
+        output_masks = outputs['masks'].cpu().numpy()[:, 0, :, :]
+
+        if evaluator_params:
+            output_score_thresholds = np.array([evaluator_params[category_id] for category_id in output_categories], dtype=np.float32)
+            wanted = output_scores >= output_score_thresholds
+
+            output_boxes = output_boxes[wanted, :]
+            output_scores = output_scores[wanted]
+            output_categories = output_categories[wanted]
+            output_masks = output_masks[wanted, :, :]
+
+        # Polygonize the masks.
+        output_polygons = polygonize_masks(output_masks, output_boxes)
+
+        if vis_dir:
+            def get_color(category_id):
+                if 'colors' in task:
+                    return task['colors'][category_id]
+                return [255, 255, 0]
+
+            output_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
+
+            # Draw the polygons on output_im.
+            # We first draw it on line_im, then dilate line_im, then apply it on output_im.
+            for box_idx, polygons in enumerate(output_polygons):
+                color = get_color(outputs['labels'][box_idx].item())
+                for coords in polygons:
+                    exterior = np.array(coords[0], dtype=np.int32)
+                    rows, cols = skimage.draw.polygon(exterior[:, 1], exterior[:, 0], shape=(output_im.shape[0], output_im.shape[1]))
+                    output_im[rows, cols, :] = color
+
+            skimage.io.imsave(os.path.join(vis_dir, '{}_im.png'.format(save_prefix)), image.numpy().transpose(1, 2, 0)[:, :, 0:3])
+            skimage.io.imsave(os.path.join(vis_dir, '{}_out.png'.format(save_prefix)), output_im)
+
+            if targets:
+                gt_boxes = targets['boxes'].long().numpy()
+                gt_masks = targets['masks'].numpy()
+                gt_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
+                for box_idx, mask in enumerate(gt_masks):
+                    color = get_color(targets['labels'][box_idx].item())
+                    gt_im[mask > 0, :] = color
+                skimage.io.imsave(os.path.join(vis_dir, '{}_gt.png'.format(save_prefix)), gt_im)
+
+        if out_dir:
+            output_data = []
+            for box_idx, polygons in enumerate(output_polygons):
+                category_name = task['categories'][output_categories[box_idx]]
+                score = float(output_scores[box_idx])
+                for coords in polygons:
+                    output_data.append([
+                        'fake_polygon_id',
+                        coords,
+                        category_name,
+                        score,
+                        {}, # no properties
+                    ])
+
+            with open(os.path.join(out_dir, '{}.json'.format(save_prefix)), 'w') as f:
+                json.dump(output_data, f)
+
+    elif task_type == 'classification':
+        if out_dir:
+            category_id = torch.argmax(outputs).item()
+            with open(os.path.join(out_dir, '{}.txt'.format(save_prefix)), 'w') as f:
+                f.write("{}\n".format(category_id))
+
 def evaluate(config, model, device, loader, half_enabled=False, vis_dir=None, probs_dir=None, out_dir=None, print_details=False, evaluator_params_list=None):
     # Is a specific task chosen for evaluation?
     selected_task = config.get('EvaluateTask', None)
@@ -673,11 +886,11 @@ def evaluate(config, model, device, loader, half_enabled=False, vis_dir=None, pr
                 # we may skip the image based on gt validity.
                 if probs_dir:
                     for image_idx, image in enumerate(images):
-                        imageid = info[image_idx]['imageid']
+                        example_id = info[image_idx]['example_id']
 
                         if task_type in ['segment', 'bin_segment']:
                             cur_outputs = outputs[task_idx][image_idx, :, :, :].cpu().numpy()
-                            np.save(os.path.join(probs_dir, '{}_{}.npy'.format(imageid, task_name)), cur_outputs)
+                            np.save(os.path.join(probs_dir, '{}_{}.npy'.format(example_id, task_name)), cur_outputs)
 
                 if task_type in ['segment', 'bin_segment', 'regress']:
                     valid = torch.stack([target[task_idx]['valid'] != 0 for target in targets], dim=0)
@@ -732,203 +945,18 @@ def evaluate(config, model, device, loader, half_enabled=False, vis_dir=None, pr
                 # Visualize outputs.
                 if vis_dir or out_dir:
                     for image_idx, image in enumerate(images):
-                        imageid = info[image_idx]['imageid']
+                        example_id = info[image_idx]['example_id']
 
-                        if task_type == 'segment':
-                            if evaluator_params:
-                                # Use user-provided score thresholds for each class.
-                                # If multiple classes have probability exceeding threshold at a pixel,
-                                # the pixel will end up colored based on the last class.
-                                pred_probs = outputs[task_idx][image_idx, :, :, :].cpu().numpy()
-                                pred_cls = np.zeros(pred_probs.shape[1:3], dtype=np.uint8)
-                                for cls_id, threshold in enumerate(evaluator_params):
-                                    pred_cls[pred_probs[cls_id, :, :] > threshold] = cls_id
-                            else:
-                                pred_cls = outputs[task_idx][image_idx, :, :, :].argmax(dim=0).cpu().numpy()
-
-                            if vis_dir:
-                                gt = satlas.model.dataset.visualize_labels(task_name, targets[image_idx][task_idx]['im'].numpy())
-                                output = satlas.model.dataset.visualize_labels(task_name, pred_cls)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_im.png'.format(imageid, task_name)), image.numpy().transpose(1, 2, 0)[:, :, 0:3])
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_gt.png'.format(imageid, task_name)), gt)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_out.png'.format(imageid, task_name)), output)
-
-                            if out_dir:
-                                skimage.io.imsave(os.path.join(out_dir, '{}_{}.png'.format(imageid, task_name)), pred_cls.astype(np.uint8))
-
-                        elif task_type == 'bin_segment':
-                            cur_outputs = outputs[task_idx][image_idx, :, :, :].cpu().numpy()
-                            if evaluator_params:
-                                cur_outputs_bin = np.stack([
-                                    cur_outputs[channel_idx, :, :] > evaluator_params[channel_idx]
-                                    for channel_idx in range(cur_outputs.shape[0])
-                                ], axis=0)
-                            else:
-                                cur_outputs_bin = cur_outputs > 0.5
-
-                            if vis_dir:
-                                gt = satlas.model.dataset.visualize_labels(task_name, targets[image_idx][task_idx]['im'].numpy() > 0.5)
-                                output = satlas.model.dataset.visualize_labels(task_name, cur_outputs_bin)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_im.png'.format(imageid, task_name)), image.numpy().transpose(1, 2, 0)[:, :, 0:3])
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_gt.png'.format(imageid, task_name)), gt)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_out.png'.format(imageid, task_name)), output)
-
-                            if out_dir:
-                                enc = satlas.util.encode_multiclass_binary(cur_outputs_bin.transpose(1, 2, 0))
-                                np.save(os.path.join(out_dir, '{}_{}.npy'.format(imageid, task_name)), enc)
-
-                        elif task_type == 'regress':
-                            gt = targets[image_idx][task_idx]['im'].numpy()
-                            output = np.clip(outputs[task_idx][image_idx, :, :].cpu().numpy(), 0, 255).astype(np.uint8)
-
-                            if vis_dir:
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_im.png'.format(imageid, task_name)), image.numpy().transpose(1, 2, 0)[:, :, 0:3])
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_gt.png'.format(imageid, task_name)), gt)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_out.png'.format(imageid, task_name)), output)
-
-                            if out_dir:
-                                skimage.io.imsave(os.path.join(out_dir, '{}_{}.png'.format(imageid, task_name)), output)
-
-                        elif task_type == 'detect':
-                            gt_boxes = targets[image_idx][task_idx]['boxes'].long().numpy()
-                            output_boxes = outputs[task_idx][image_idx]['boxes'].long().cpu().numpy()
-                            output_scores = outputs[task_idx][image_idx]['scores'].cpu().numpy()
-                            output_categories = outputs[task_idx][image_idx]['labels'].cpu().numpy()
-
-                            if evaluator_params:
-                                output_score_thresholds = np.array([evaluator_params[category_id] for category_id in output_categories], dtype=np.float32)
-                                wanted = output_scores >= output_score_thresholds
-
-                                output_boxes = output_boxes[wanted, :]
-                                output_scores = output_scores[wanted]
-                                output_categories = output_categories[wanted]
-
-                            if vis_dir:
-                                def get_color(category_id):
-                                    if 'colors' in task:
-                                        return task['colors'][category_id]
-                                    return [255, 255, 0]
-
-                                gt_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
-                                output_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
-
-                                for box_idx, box in enumerate(gt_boxes):
-                                    color = get_color(targets[image_idx][task_idx]['labels'][box_idx].item())
-                                    left = satlas.util.clip(box[0], 0, gt_im.shape[1])
-                                    top = satlas.util.clip(box[1], 0, gt_im.shape[0])
-                                    right = satlas.util.clip(box[2], 0, gt_im.shape[1])
-                                    bottom = satlas.util.clip(box[3], 0, gt_im.shape[0])
-                                    gt_im[top:bottom, left:left+2, :] = color
-                                    gt_im[top:bottom, right-2:right, :] = color
-                                    gt_im[top:top+2, left:right, :] = color
-                                    gt_im[bottom-2:bottom, left:right, :] = color
-                                for box_idx, box in enumerate(output_boxes):
-                                    color = get_color(outputs[task_idx][image_idx]['labels'][box_idx].item())
-                                    left = satlas.util.clip(box[0], 0, output_im.shape[1])
-                                    top = satlas.util.clip(box[1], 0, output_im.shape[0])
-                                    right = satlas.util.clip(box[2], 0, output_im.shape[1])
-                                    bottom = satlas.util.clip(box[3], 0, output_im.shape[0])
-                                    output_im[top:bottom, left:left+2, :] = color
-                                    output_im[top:bottom, right-2:right, :] = color
-                                    output_im[top:top+2, left:right, :] = color
-                                    output_im[bottom-2:bottom, left:right, :] = color
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_gt.png'.format(imageid, task_name)), gt_im)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_out.png'.format(imageid, task_name)), output_im)
-
-                            if out_dir:
-                                output_data = [(
-                                    int(box[0]),
-                                    int(box[1]),
-                                    int(box[2]),
-                                    int(box[3]),
-                                    task['categories'][output_categories[i]],
-                                    float(output_scores[i]),
-                                ) for i, box in enumerate(output_boxes)]
-
-                                with open(os.path.join(out_dir, '{}_{}.json'.format(imageid, task_name)), 'w') as f:
-                                    json.dump(output_data, f)
-
-                        elif task_type == 'instance':
-                            gt_boxes = targets[image_idx][task_idx]['boxes'].long().numpy()
-                            gt_masks = targets[image_idx][task_idx]['masks'].numpy()
-                            output_boxes = outputs[task_idx][image_idx]['boxes'].long().cpu().numpy()
-                            output_scores = outputs[task_idx][image_idx]['scores'].cpu().numpy()
-                            output_categories = outputs[task_idx][image_idx]['labels'].cpu().numpy()
-                            output_masks = outputs[task_idx][image_idx]['masks'].cpu().numpy()[:, 0, :, :]
-
-                            if evaluator_params:
-                                output_score_thresholds = np.array([evaluator_params[category_id] for category_id in output_categories], dtype=np.float32)
-                                wanted = output_scores >= output_score_thresholds
-
-                                output_boxes = output_boxes[wanted, :]
-                                output_scores = output_scores[wanted]
-                                output_categories = output_categories[wanted]
-                                output_masks = output_masks[wanted, :, :]
-
-                            # Polygonize the masks.
-                            output_polygons = polygonize_masks(output_masks, output_boxes)
-
-                            if vis_dir:
-                                def get_color(category_id):
-                                    if 'colors' in task:
-                                        return task['colors'][category_id]
-                                    return [255, 255, 0]
-
-                                gt_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
-                                output_im = image.numpy().transpose(1, 2, 0)[:, :, 0:3].copy()
-
-                                for box_idx, mask in enumerate(gt_masks):
-                                    color = get_color(targets[image_idx][task_idx]['labels'][box_idx].item())
-                                    gt_im[mask > 0, :] = color
-
-                                # Draw the lines on output_im.
-                                # We first draw it on line_im, then dilate line_im, then apply it on output_im.
-                                for box_idx, polygons in enumerate(output_polygons):
-                                    '''line_im = np.zeros((output_im.shape[0], output_im.shape[1]), dtype=np.uint8)
-                                    color = get_color(outputs[task_idx][image_idx]['labels'][box_idx].item())
-
-                                    for coords in polygons:
-                                        exterior = coords[0]
-                                        for i in range(len(exterior) - 1):
-                                            rows, cols = skimage.draw.line(exterior[i][1], exterior[i][0], exterior[i+1][1], exterior[i+1][0])
-                                            valid = (rows >= 0) & (rows < output_im.shape[0]) & (cols >= 0) & (cols < output_im.shape[1])
-                                            line_im[rows[valid], cols[valid]] = 1
-
-                                    for _ in range(2):
-                                        line_im = skimage.morphology.binary_dilation(line_im)
-                                    output_im[line_im > 0, :] = color'''
-                                    color = get_color(outputs[task_idx][image_idx]['labels'][box_idx].item())
-                                    for coords in polygons:
-                                        exterior = np.array(coords[0], dtype=np.int32)
-                                        rows, cols = skimage.draw.polygon(exterior[:, 1], exterior[:, 0], shape=(output_im.shape[0], output_im.shape[1]))
-                                        output_im[rows, cols, :] = color
-
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_im.png'.format(imageid, task_name)), image.numpy().transpose(1, 2, 0)[:, :, 0:3])
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_gt.png'.format(imageid, task_name)), gt_im)
-                                skimage.io.imsave(os.path.join(vis_dir, '{}_{}_out.png'.format(imageid, task_name)), output_im)
-
-                            if out_dir:
-                                output_data = []
-                                for box_idx, polygons in enumerate(output_polygons):
-                                    category_name = task['categories'][output_categories[box_idx]]
-                                    score = float(output_scores[box_idx])
-                                    for coords in polygons:
-                                        output_data.append([
-                                            'fake_polygon_id',
-                                            coords,
-                                            category_name,
-                                            score,
-                                            {}, # no properties
-                                        ])
-
-                                with open(os.path.join(out_dir, '{}_{}.json'.format(imageid, task_name)), 'w') as f:
-                                    json.dump(output_data, f)
-
-                        elif task_type == 'classification':
-                            if out_dir:
-                                category_id = torch.argmax(outputs[task_idx][image_idx, :]).item()
-                                with open(os.path.join(out_dir, '{}_{}.txt'.format(imageid, task_name)), 'w') as f:
-                                    f.write("{}\n".format(category_id))
+                        visualize_outputs(
+                            task=task,
+                            image=image.numpy().transpose(1, 2, 0)[:, :, 0:3],
+                            outputs=outputs[task_idx][image_idx],
+                            targets=targets[image_idx][task_idx],
+                            vis_dir=vis_dir,
+                            out_dir=out_dir,
+                            evaluator_params=evaluator_params,
+                            save_prefix='{}_{}'.format(example_id, task_name),
+                        )
 
         avg_loss = np.mean([loss for losses in all_losses for loss in losses])
         avg_losses = [np.mean(losses) for losses in all_losses]

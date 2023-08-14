@@ -7,6 +7,9 @@ All data is released under [ODC-BY](DataLicense).
 
 Visit [satlas.allen.ai](https://satlas.allen.ai/) to view the data in an interactive map.
 
+Currently the geospatial data is computed between January 2016 and December 2022.
+By October 2023, we aim to begin automatically releasing updates on a monthly basis.
+
 ### Marine Infrastructure (Off-shore Turbines and Platforms)
 
 Marine infrastructure points are available as a single GeoJSON or KML file:
