@@ -19,7 +19,7 @@ Missing values indicate that there were insufficient ground truth objects in tha
 
 Below, Count shows the number of objects in the geospatial data products.
 
-This report may change as the data is improved over time. This version of the report is dated 16 August 2023.
+This report may change as the data is improved over time. The current version is last modified 16 August 2023.
 
 ## Solar Farms
 
