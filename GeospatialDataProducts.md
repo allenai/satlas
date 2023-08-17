@@ -69,3 +69,8 @@ Each feature is annotated with these attributes:
 Due to the large size, the super-resolved imagery is not currently available for bulk download.
 
 For the training and inference code and pre-trained model weights, see https://github.com/allenai/satlas-super-resolution/.
+
+## Contact
+
+If you have feedback about the code, data, or models, or if you would like to see new types of geospatial data that are feasible to produce from Sentinel-2 imagery,
+you can contact us by [opening an issue](https://github.com/allenai/satlas/issues/new) or via e-mail at satlas@allenai.org.

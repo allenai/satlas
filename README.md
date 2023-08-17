@@ -101,3 +101,9 @@ Compute precision and recall stats on the validation data:
 ### Inference on Custom Images
 
 [See guide on applying Satlas/SatlasPretrain models on custom images.](CustomInference.md#sentinel-2-inference-example)
+
+Contact
+-------
+
+If you have feedback about the code, data, or models, or if you would like to see new types of geospatial data that are feasible to produce from Sentinel-2 imagery,
+you can contact us by [opening an issue](https://github.com/allenai/satlas/issues/new) or via e-mail at satlas@allenai.org.
