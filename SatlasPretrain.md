@@ -343,3 +343,13 @@ Then train the models:
 With visualization:
 
     python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/
+
+
+Authors
+-------
+
+- Favyen Bastani
+- Piper Wolters
+- Ritwik Gupta
+- Joe Ferdinando
+- Ani Kembhavi
