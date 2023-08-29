@@ -7,27 +7,31 @@ All data is released under [ODC-BY](DataLicense).
 
 Visit [satlas.allen.ai](https://satlas.allen.ai/) to view the data in an interactive map.
 
-Currently the geospatial data is computed between January 2016 and December 2022.
-By October 2023, we aim to begin automatically releasing updates on a monthly basis.
-
 ### Marine Infrastructure (Off-shore Turbines and Platforms)
 
-Marine infrastructure points are available as a single GeoJSON or KML file:
+Marine infrastructure points are available as monthly snapshots in GeoJSON, KML, or shapefile formats:
+
+- GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/YYYY-MM.geojson
+- KML: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/YYYY-MM.kml
+- Shapefile: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/YYYY-MM.shp
+
+For example, `2023-01.geojson` contains off-shore wind turbines and platforms that we believe are
+present as of January 2023. Replace `YYYY-MM` with `latest` to get the latest data.
+
+Each point is annotated with a `category` attribute, either `offshore_wind_turbine` or `offshore_platform`.
+
+An index file lists all currently available files, along with their hash and last modified time.
+You can programatically query this file to detect updates, which generally will be published
+between the 15th and 20th of each month.
+Data for previous months will be updated when (a) smoothing that includes the latest images
+changes our estimates for previous months; or (b) we develop improved models.
+
+- Index: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/index.txt
+
+The points are also available as a single GeoJSON, with additional `start` and `end` attributes
+indicating when the object was constructed or removed (e.g. `start=2021-05,end=2022-01`):
 
 - GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/marine.geojson
-- KML: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/marine.kml
-
-Each point is annotated with these attributes:
-- `category`: either `offshore_wind_turbine` or `offshore_platform`
-- `start`: when the object was constructed
-- `end`: when the object was removed, or `2022-12` if still present
-
-Points are also available as snapshots at different points in time, in which case
-the file only contains points present at that time (rather than the `start` and
-`end` attributes.) Replace YYYY-MM with a year between 2016 and 2022 and month
-between 01 and 12:
-
-https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/YYYY-MM.geojson
 
 ### Tree Cover
 
@@ -35,8 +39,9 @@ Tree cover is available as GeoTIFF files for each WebMercator tile at zoom 7.
 WebMercator tiles are indexed from the top-left of the projection coordinate
 system from (0, 0) to (127, 127). The resolution is 10 m/pixel.
 
-Replace YYYY-MM with a year between 2016 and 2022 and month either 01 or 07,
-along with the unpadded X and Y index of the tile (like 20_44.tif for Seattle):
+Replace YYYY-MM with the padded year and month (e.g. 2023-02 or 2023-11), along with the
+unpadded X and Y index of the tile (like `20_44.tif` for Seattle).
+Currently the data is computed for 2016-01 to 2023-01 only in 01 (January) and 07 (July).
 
 https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/tree-cover/YYYY-MM/X_Y.tif
 
@@ -55,14 +60,32 @@ The GeoTIFF contains a single 8-bit band, with these values:
 
 ### Renewable Energy Infrastructure (On-shore Wind Turbines and Solar Farms)
 
-Renewable energy infrastructure points (on-shore wind turbines) and polygons (solar farms) are available as monthly GeoJSON files:
+Renewable energy infrastructure points (on-shore wind turbines) and polygons (solar farms) are available as monthly snapshots in GeoJSON, KML, or shapefile formats.
 
 - GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/YYYY-MM.geojson
+- KML: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/YYYY-MM.kml
+- Shapefile (wind turbines): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/YYYY-MM_wind.shp
+- Shapefile (solar farms): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/YYYY-MM_solar.shp
 
-Replace YYYY-MM with a year between 2016 and 2022, and month either 01 or 07.
+For example, `2023-01.geojson` contains wind turbines and solar farms that we believe are
+present as of January 2023. Replace `YYYY-MM` with `latest` to get the latest data.
 
-Each feature is annotated with these attributes:
-- `category`: either `wind_turbine` or `solar_farm`
+Each point is annotated with a `category` attribute, either `wind_turbine` or `solar_farm`.
+
+An index file lists all currently available files, along with their hash and last modified time.
+You can programatically query this file to detect updates, which generally will be published
+between the 15th and 20th of each month.
+Data for previous months will be updated when (a) smoothing that includes the latest images
+changes our estimates for previous months; or (b) we develop improved models.
+
+- Index: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/index.txt
+
+The data is also available as a single GeoJSON, with additional `start` and `end` attributes
+indicating when the object was constructed or removed (e.g. `start=2021-05,end=2022-01`).
+Solar farms in this combined format are not as accurate, since they are split up when different
+parts of the solar farm were built at different times.
+
+- GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/renewable.geojson
 
 ### Super-Resolution
 
