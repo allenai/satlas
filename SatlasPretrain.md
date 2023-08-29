@@ -360,7 +360,7 @@ With visualization:
 Fine-tuning
 -----------
 
-Download the downstream datasets:
+The code in this repository can also be used to replicate the experiments on downstream datasets. Download the downstream datasets:
 
     wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain_finetune.tar
     tar xvf satlaspretrain_finetune.tar
@@ -369,8 +369,10 @@ Example configuration files for 50 training examples are included, e.g.:
 
     python -m satlas.cmd.model.train --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt
     python -m satlas.cmd.model.train --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt
-    python -m satlas.cmd.model.evaluate --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt --details
-    python -m satlas.cmd.model.evaluate --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt --details
+    python -m satlas.cmd.model.infer --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt --details
+    python -m satlas.cmd.model.infer --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt --details
+
+The "satlas" configuration files specify `RestorePath` that loads SatlasPretrain weights. `TrainMaxTiles` can be updated for different numbers of training examples.
 
 
 Authors
