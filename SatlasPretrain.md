@@ -45,9 +45,21 @@ Small versions of the NAIP and Sentinel-2 images are available. These can be use
     ln -s sentinel2_small sentinel2
     ln -s naip_small naip
 
+SatlasPretrain includes images and labels from the sources below, re-distributed under the original licenses.
+For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf).
+
+- [Sentinel-1, Sentinel-2](https://sentinel.esa.int/web/sentinel/missions) (ESA): see https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
+- [NAIP](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-aerial-photography-national-agriculture-imagery-program-naip) (USGS): public domain
+- [OpenStreetMap](https://www.openstreetmap.org): ODbL
+- [C2S](https://mlhub.earth/data/c2smsfloods_v1): CC-BY-4.0
+- [Microsoft Buildings](https://github.com/microsoft/USBuildingFootprints): ODbL
+- [WorldCover](https://esa-worldcover.org/): CC-BY-4.0
+- [NOAA Lidar Scans](https://coast.noaa.gov/digitalcoast/data/coastallidar.html): public domain
+- New annotation for SatlasPretrain: we release these labels under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense).
+
 ### Model Weights
 
-Weights for SatlasNet models pre-trained on SatlasPretrain can be downloaded from these URLs:
+We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense):
 
 - High-resolution, single-image (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
 - High-resolution, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres-multi.pth
@@ -345,6 +357,22 @@ With visualization:
     python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/
 
 
+Fine-tuning
+-----------
+
+Download the downstream datasets:
+
+    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain_finetune.tar
+    tar xvf satlaspretrain_finetune.tar
+
+Example configuration files for 50 training examples are included, e.g.:
+
+    python -m satlas.cmd.model.train --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt
+    python -m satlas.cmd.model.train --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt
+    python -m satlas.cmd.model.evaluate --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt --details
+    python -m satlas.cmd.model.evaluate --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt --details
+
+
 Authors
 -------
 
@@ -353,3 +381,5 @@ Authors
 - Ritwik Gupta
 - Joe Ferdinando
 - Ani Kembhavi
+
+Contact: favyenb@allenai.org or [open an issue](https://github.com/allenai/satlas/issues/new)

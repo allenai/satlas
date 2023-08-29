@@ -10,7 +10,7 @@ from torch.autograd import Variable
 
 import satlas.model.dataset
 import satlas.model.evaluate
-import satlas.model.model
+import satlas.model.models
 import satlas.model.util
 import satlas.transforms
 
@@ -73,6 +73,7 @@ def main(args, config):
         num_images=config.get('NumImages', 1),
         task_transforms=get_task_transforms('TrainTransforms'),
         phase="Train",
+        custom_images=config.get('CustomImages', False),
     )
 
     val_data = satlas.model.dataset.Dataset(
@@ -83,6 +84,7 @@ def main(args, config):
         num_images=config.get('NumImages', 1),
         task_transforms=get_task_transforms('ValTransforms'),
         phase="Val",
+        custom_images=config.get('CustomImages', False),
     )
 
     print('loaded {} train, {} valid'.format(len(train_data), len(val_data)))
@@ -123,7 +125,7 @@ def main(args, config):
     # Initialize model.
     device = torch.device("cuda")
     model_config = config['Model']
-    model = satlas.model.model.Model({
+    model = satlas.model.models.get_model({
         'config': model_config,
         'channels': channels,
         'tasks': config['Tasks'],

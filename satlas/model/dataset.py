@@ -614,13 +614,18 @@ def load_multi_label_classification_target(spec, fname):
 
 class Option(object):
     # Corresponds to one training example.
-    def __init__(self, task_spec=None, task_idx=None, example_id=None, example_dir=None):
+    def __init__(self, task_spec=None, task_idx=None, example_id=None, example_dir=None, satlaspretrain_finetune=False):
         self.task_spec = task_spec
         self.task_idx = task_idx,
         self.example_id = example_id
         self.example_dir = example_dir
+        self.satlaspretrain_finetune = satlaspretrain_finetune
 
     def __repr__(self):
+        if self.satlaspretrain_finetune:
+            # Override default repr to conform to how we picked training examples for SatlasPretrain fine-tune experiments.
+            return '{}_0'.format(self.example_id)
+
         return '{}_{}'.format(self.task_spec['Name'], self.example_id)
 
 class Dataset(object):
@@ -634,6 +639,7 @@ class Dataset(object):
         num_images = 1, # Max number of images to load for each example.
         task_transforms=None, # Different transforms for particular tasks.
         phase=None, # Specifies Train/Val/Test for the purpose of looking for split filenames.
+        custom_images=False, # Whether images may be inconsistent sizes not matching chip-size.
     ):
         self.task_specs = task_specs
         self.transforms = transforms
@@ -641,12 +647,14 @@ class Dataset(object):
         self.tasks = [spec['Task'] for spec in self.task_specs]
         self.num_images = num_images
         self.task_transforms = task_transforms
+        self.custom_images = custom_images
 
         # Create list of options (examples).
         self.options = []
 
         for task_idx, spec in enumerate(task_specs):
             task_name = spec['Name']
+            tiles_are_strings = spec['Task'].get('TilesAreStrings', False)
 
             label_dir = spec['LabelDir']
             task_dir = os.path.join(label_dir, task_name)
@@ -657,22 +665,31 @@ class Dataset(object):
             # Get the set of tiles we want to consider for this task, based on the phase-specific split.
             split_name = phase + "Split" # e.g. TrainSplit, ValSplit, TestSplit
             with open(spec[split_name], 'r') as f:
-                tile_set = set([(col, row) for col, row in json.load(f)])
+                if tiles_are_strings:
+                    tile_set = set(json.load(f))
+                else:
+                    tile_set = set([(col, row) for col, row in json.load(f)])
 
             # Add options.
             cur_options = []
             for example_id in os.listdir(task_dir):
                 # First two parts of the directory name always specify the zoom 13 tile.
-                parts = example_id.split('_')
-                tile = (int(parts[0]), int(parts[1]))
-                if tile not in tile_set:
-                    continue
+                # Unless TilesAreStrings is set, in which case the split directly references the example_id (folder names).
+                if tiles_are_strings:
+                    if example_id not in tile_set:
+                        continue
+                else:
+                    parts = example_id.split('_')
+                    tile = (int(parts[0]), int(parts[1]))
+                    if tile not in tile_set:
+                        continue
 
                 cur_options.append(Option(
                     task_spec=spec,
                     task_idx=task_idx,
                     example_id=example_id,
                     example_dir=os.path.join(task_dir, example_id),
+                    satlaspretrain_finetune=spec.get('SatlasPretrainFinetune', False),
                 ))
 
             print('task {}: loaded {} options'.format(task_name, len(cur_options)))
@@ -739,6 +756,12 @@ class Dataset(object):
                     im = skimage.io.imread(fname)
                 except Exception as e:
                     print('warning: error reading from {}: {}'.format(fname, e))
+                    continue
+
+                if self.custom_images:
+                    # This means image may not be chip_size in height/width.
+                    # In this case we only support loading one channel.
+                    cur_image = im
                     continue
 
                 # Some bands are stored at lower resolution, like 20+ m/pixel Sentinel-2 bands.

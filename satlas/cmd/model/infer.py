@@ -9,7 +9,7 @@ import torch
 import torchvision
 
 import satlas.model.dataset
-import satlas.model.model
+import satlas.model.models
 import satlas.model.util
 import satlas.model.evaluate
 import satlas.transforms
@@ -63,6 +63,7 @@ def main(args):
         max_tiles=config.get('TestMaxTiles', None),
         num_images=config.get('NumImages', 1),
         phase='Test',
+        custom_images=config.get('CustomImages', False),
     )
 
     test_loader = torch.utils.data.DataLoader(
@@ -78,7 +79,7 @@ def main(args):
     # Initialize model and device.
     device = torch.device("cuda")
     model_config = config['Model']
-    model = satlas.model.model.Model({
+    model = satlas.model.models.get_model({
         'config': model_config,
         'channels': channels,
         'tasks': config['Tasks'],

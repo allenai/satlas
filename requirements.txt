@@ -8,3 +8,4 @@ tqdm
 torch
 torchvision
 torchaudio
+vit_pytorch
