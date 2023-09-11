@@ -51,6 +51,8 @@ This download link contains an archive with four folders:
 - `models/` contains the trained model weights.
 - `splits/` contains metadata about the training and validation splits.
 
+There is also [a smaller (2.8 GB) download](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_modelsonly_2023-07-24.tar) with just the model weights.
+
 See [Using the Code](#using-the-code) below for details on training and applying models.
 
 The format of the task-specific datasets is described in [DatasetSpec.md](DatasetSpec.md).
