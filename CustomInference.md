@@ -79,6 +79,7 @@ First, obtain the code and the model:
 Load the model and apply the model, and extract its building predictions:
 
     import json
+    import skimage.io
     import torch
     import torchvision
 
@@ -113,14 +114,15 @@ Load the model and apply the model, and extract its building predictions:
         gpu_im = im.to(device).float() / 255
         outputs, _ = model([gpu_im])
 
-        for task_idx, spec in config['Tasks']:
-            satlas.model.evaluate.visualize_outputs(
+        for task_idx, spec in enumerate(config['Tasks']):
+            vis_output, _, _, _ = satlas.model.evaluate.visualize_outputs(
                 task=spec['Task'],
                 image=im.numpy().transpose(1, 2, 0),
                 outputs=outputs[task_idx][0],
-                vis_dir='./',
-                save_prefix='out',
+                return_vis=True,
             )
+            if vis_output is not None:
+                skimage.io.imsave('out_{}.png'.format(spec['Name']), vis_output)
 
 See `configs/highres_pretrain_old.txt` for a list of all the heads of this model.
 
@@ -180,21 +182,30 @@ Now we can load the images, normalize them, and apply the model:
     image = image.reshape(image.shape[0]*image.shape[1], image.shape[2], image.shape[3])
 
     # The image is large so apply it on windows.
-    # Here we collect the land cover outputs (head 2).
-    solar_farm_vis = np.zeros((image.shape[1], image.shape[2], 3), dtype=np.uint8)
-    crop_size = 2048
+    # Here we collect outputs from head 0 which is the only head of the solar farm model.
+    vis_output = np.zeros((image.shape[1], image.shape[2], 3), dtype=np.uint8)
+    crop_size = 1024
     head_idx = 0
 
     with torch.no_grad():
         for row in tqdm.tqdm(range(0, image.shape[1], crop_size)):
             for col in range(0, image.shape[2], crop_size):
-                crop = torch.as_tensor(image[:, row:row+crop_size, col:col+crop_size])
-                gpu_crop = crop.to(device).float() / 255
+                crop = image[:, row:row+crop_size, col:col+crop_size]
+                vis_crop = crop.transpose(1, 2, 0)[:, :, 0:3]
+                gpu_crop = torch.as_tensor(crop).to(device).float() / 255
                 outputs, _ = model([gpu_crop])
-                # Convert binary segmentation probabilities to classes.
-                pred_cls = outputs[head_idx][0, :, :, :].cpu().numpy() > 0.5
-                crop_colored = satlas.model.evaluate.segmentation_mask_to_color(config['Tasks'][head_idx]['Task'], pred_cls)
-                solar_farm_vis[row:row+crop_size, col:col+crop_size, :] = crop_colored
+                vis_output_crop, _, _, _ = satlas.model.evaluate.visualize_outputs(
+                    task=config['Tasks'][head_idx]['Task'],
+                    image=vis_crop,
+                    outputs=outputs[head_idx][0],
+                    return_vis=True,
+                )
+                if len(vis_output_crop.shape) == 2:
+                    vis_output[row:row+crop_size, col:col+crop_size, 0] = vis_output_crop
+                    vis_output[row:row+crop_size, col:col+crop_size, 1] = vis_output_crop
+                    vis_output[row:row+crop_size, col:col+crop_size, 2] = vis_output_crop
+                else:
+                    vis_output[row:row+crop_size, col:col+crop_size, :] = vis_output_crop
 
     skimage.io.imsave('rgb.png', image[0:3, :, :].transpose(1, 2, 0))
-    skimage.io.imsave('solar_farm.png', solar_farm_vis)
+    skimage.io.imsave('output.png', vis_output)
