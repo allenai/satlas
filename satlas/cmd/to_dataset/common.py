@@ -13,7 +13,7 @@ image_types = [{
     'factor': 16,
 }]
 
-def get_image_types(satlas_root, ):
+def get_image_types(satlas_root):
     for image_meta in image_types:
         print('preprocess image type', image_meta['name'])
         image_times_fname = os.path.join(satlas_root, 'metadata', 'image_times.json')

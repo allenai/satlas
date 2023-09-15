@@ -123,7 +123,7 @@ def main(args, config):
         torch.distributed.init_process_group(backend='nccl', init_method='env://')
 
     # Initialize model.
-    device = torch.device("cuda")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_config = config['Model']
     model = satlas.model.models.get_model({
         'config': model_config,

@@ -94,7 +94,7 @@ Load the model and apply the model, and extract its building predictions:
     # Read config and initialize the model.
     with open(config_path, 'r') as f:
         config = json.load(f)
-    device = torch.device("cuda")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     for spec in config['Tasks']:
         if 'Task' not in spec:
             spec['Task'] = satlas.model.dataset.tasks[spec['Name']]
@@ -146,10 +146,8 @@ Now we can load the images, normalize them, and apply the model:
 
     import json
     import numpy as np
-    from osgeo import gdal
     import skimage.io
     import torch
-    import torchvision
     import tqdm
 
     import satlas.model.evaluate
@@ -163,7 +161,7 @@ Now we can load the images, normalize them, and apply the model:
     # Read config and initialize the model.
     with open(config_path, 'r') as f:
         config = json.load(f)
-    device = torch.device("cuda")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     for spec in config['Tasks']:
         if 'Task' not in spec:
             spec['Task'] = satlas.model.dataset.tasks[spec['Name']]
