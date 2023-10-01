@@ -61,33 +61,32 @@ For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub
 
 We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense):
 
-- High-resolution, single-image (NAIP + others @ 0.5-2 m/pixel): https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres.pth
-- High-resolution, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-highres-multi.pth
-- Sentinel-2, single-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres.pth
-- Sentinel-2, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-multi.pth
-- Sentinel-2, multi-band, single-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band.pth
-- Sentinel-2, multi-band, multi-image: https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-model-v1-lowres-band-multi.pth
+| Image Type | Swin-v2-Base | Swin-v2-Tiny | Resnet50 | Resnet152 |
+| ---------- | ------------ | ------------ | -------- | --------- |
+| Sentinel-2, single-image, RGB | [sentinel2/si_sb_base.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_base.pth) | [sentinel2/si_sb_tiny.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_tiny.pth) | [sentinel2/si_sb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_resnet50.pth) | [sentinel2/si_sb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_resnet152.pth) |
+| Sentinel-2, single-image, multi-band | [sentinel2/old_si_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_si_mb.pth) | [sentinel2/si_mb_tiny.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_tiny.pth) | [sentinel2/si_mb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_resnet50.pth) | [sentinel2/si_mb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_resnet152.pth) |
+| Sentinel-2, multi-image, RGB | [sentinel2/old_mi_sb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_mi_sb.pth) | Unavailable | [sentinel2/mi_sb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/mi_sb_resnet50.pth) | [sentinel2/mi_sb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/mi_sb_resnet152.pth) |
+| Sentinel-2, multi-image, multi-band | [sentinel2/old_mi_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_mi_mb.pth) | Unavailable | Unavailable | Unavailable |
+| NAIP and other high-res, single-image | [highres/old_pretrain.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_pretrain.pth) | Unavailable | Unavailable | Unavailable |
+| NAIP and other high-res, multi-image | [highres/old_mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_mi.pth) | Unavailable | Unavailable | Unavailable |
+| Landsat 8/9, single-image, multi-band | [landsat/si.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/si.pth) | Unavailable | Unavailable | Unavailable |
+| Landsat 8/9, multi-image, multi-band | [landsat/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/mi.pth) Unavailable | Unavailable | Unavailable |
+| Sentinel-1, single-image, vh+vv | TODO | Unavailable | Unavailable | Unavailable |
+
+Single-image models learn strong representations for individual satellite or aerial images, while multi-image models use multiple image captures of the same location for added robustness when making predictions about static objects. In multi-image models, feature maps from the backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. See [ModelArchitecture.md](ModelArchitecture.md) for more details.
+
+Sentinel-2 RGB models input B2, B3, and B4 only, while the multi-band models input 9 bands (see [Normalization.md](Normalization.md#sentinel-2-images) for details). NAIP models input RGB aerial images, and we have found them to be effective on aerial imagery from a variety of sources and datasets. Landsat models input B1-B11 (all bands).
 
 These documents are useful for using the models:
 
-- [Normalization.md](Normalization.md#sentinel-2-images) documents how images should be normalized for input to the models.
+- [Normalization.md](Normalization.md) documents how images should be normalized for input to the models.
 - [See an example of applying the model and visualizing its outputs.](CustomInference.md#sentinel-2-inference-example)
 - If you plan to fine-tune the backbone for downstream tasks, [see the example on loading the backbone and extracting feature maps.](CustomInference.md#extracting-representations-example)
 
-The models can also be used to compute outputs and stats on the SatlasPretrain validation set:
+The models correspond to configuration files with the same name, e.g. `sentinel2/si_sb_base.pth` is trained using `configs/sentinel2/si_sb_base.txt`. The model weights can be used to compute outputs and stats on the SatlasPretrain validation set, e.g.:
 
-    python -m satlas.cmd.model.infer --config_path configs/highres_pretrain_old.txt --weights models/satlas-model-v1-highres.pth --details --vis_dir vis/
-    python -m satlas.cmd.model.infer --config_path configs/highres_joint_old_multi.txt --weights models/satlas-model-v1-highres-multi.pth --details --vis_dir vis/
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old.txt --weights models/satlas-model-v1-lowres.pth --details --vis_dir vis/
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_multi.txt --weights models/satlas-model-v1-lowres-multi.pth --details --vis_dir vis/
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band.txt --weights models/satlas-model-v1-lowres-band.pth --details --vis_dir vis/
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint_old_band_multi.txt --weights models/satlas-model-v1-lowres-band-multi.pth --details --vis_dir vis/
+    python -m satlas.cmd.model.infer --config_path configs/sentinel2/si_sb_base.txt --weights models/sentinel2/si_sb_base.pth --details --vis_dir vis/
 
-The multi-image models are geared towards making predictions about static objects, using multiple image captures of the same location for added robustness.
-Features maps from the Swin backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. During training, 4 images for high-res and 8 images for low-res are used.
-See [ModelArchitecture.md](ModelArchitecture.md) for more details.
-
-The multi-band models for Sentinel-2 input 9 channels. See [Normalization.md](Normalization.md#sentinel-2-images) for more details.
 
 
 Dataset Structure

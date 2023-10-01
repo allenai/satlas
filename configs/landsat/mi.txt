@@ -1,7 +1,7 @@
 {
-    "Channels": ["tci", "fake", "fake", "b05", "b06", "b07", "b08", "b11", "b12"],
-    "BatchSize": 32,
-    "ValBatchSize": 8,
+    "Channels": ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11"],
+    "BatchSize": 16,
+    "ValBatchSize": 2,
 
     "TrainTransforms": [{
         "Name": "CropFlip",
@@ -31,13 +31,13 @@
 
     "NumImages": 8,
 
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/landsat/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
         "Backbone": {
             "Name": "aggregation",
-            "ImageChannels": 9,
+            "ImageChannels": 11,
             "Groups": [[0, 1, 2, 3, 4, 5, 6, 7]],
             "AggregationOp": "max",
             "Backbone": {
@@ -62,6 +62,8 @@
         }, {
             "Name": "simple"
         }, {
+            "Name": "simple"
+        }, {
             "Name": "simple",
             "Loss": "l1"
         }, {
@@ -69,6 +71,24 @@
         }, {
             "Name": "simple",
             "Loss": "l1"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
         }]
     },
     "Optimizer": {
@@ -87,7 +107,7 @@
     "SummaryExamples": 32768,
     "TrainSampler": {
         "Name": "tile_weight",
-        "Weights": "satlas_root/bal_weights/lowres.json"
+        "Weights": "satlas_root/bal_weights/landsat.json"
     },
     "Tasks": [{
         "Name": "polygon",
@@ -113,6 +133,13 @@
         "ValSplit": "satlas_root/metadata/train_lowres_val.json",
         "TestSplit": "satlas_root/metadata/test_lowres.json"
     }, {
+        "Name": "polyline_bin_segment",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
         "Name": "dem",
         "Metric": "l1",
         "LabelDir": "satlas_root/datasets/lowres/",
@@ -130,6 +157,78 @@
         "Name": "tree_cover",
         "Metric": "l1",
         "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "park_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "park_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "power_plant_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "quarry_resource",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "track_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "road_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
         "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
         "ValSplit": "satlas_root/metadata/train_lowres_val.json",
         "TestSplit": "satlas_root/metadata/test_lowres.json"

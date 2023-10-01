@@ -98,6 +98,13 @@ class SwinBackbone(torch.nn.Module):
                 [16, 768],
                 [32, 1536],
             ]
+        elif self.arch == 'swin_v2_t':
+            self.out_channels = [
+                [4, 96],
+                [8, 192],
+                [16, 384],
+                [32, 768],
+            ]
         else:
             raise Exception('out_channels needs to be implemented for swin_t/swin_s')
 

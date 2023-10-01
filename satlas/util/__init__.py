@@ -77,6 +77,9 @@ def load_window(base_dir, column, row, width, height, chip_size=512, bands=3):
             if bands == 1 and len(cur_im.shape) == 2:
                 # Add channel dimension for greyscale images.
                 cur_im = cur_im[:, :, None]
+            if cur_im.shape[0] < chip_size:
+                factor = chip_size // cur_im.shape[0]
+                cur_im = cur_im.repeat(repeats=factor, axis=0).repeat(repeats=factor, axis=1)
 
             cur_col_off = chip_size*i
             cur_row_off = chip_size*j

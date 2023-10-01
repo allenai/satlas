@@ -1,7 +1,7 @@
 {
     "Channels": ["tci", "fake", "fake"],
-    "BatchSize": 32,
-    "ValBatchSize": 8,
+    "BatchSize": 16,
+    "ValBatchSize": 2,
 
     "TrainTransforms": [{
         "Name": "CropFlip",
@@ -13,10 +13,6 @@
         "Name": "Resize",
         "ResizeMin": 512,
         "ResizeMax": 512
-    }, {
-        "Name": "Brightness",
-        "MaxFactor": 0.1,
-        "MaxBias": 16
     }],
     "ValTransforms": [{
         "Name": "Pad",
@@ -33,14 +29,22 @@
     "TestMaxTiles": 1000000,
     "NumLoaderWorkers": 4,
 
-    "SavePath": "models/LABEL/",
+    "NumImages": 4,
+
+    "SavePath": "models/highres/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
         "Backbone": {
-            "Name": "swin",
-            "Arch": "swin_v2_b",
-            "Pretrained": true
+            "Name": "aggregation",
+            "ImageChannels": 3,
+            "Groups": [[0, 1, 2, 3]],
+            "AggregationOp": "max",
+            "Backbone": {
+                "Name": "swin",
+                "Arch": "swin_v2_b",
+                "Pretrained": true
+            }
         },
         "Intermediates": [{
             "Name": "fpn",
@@ -94,8 +98,14 @@
             "Name": "frcnn",
             "UseLayers": [1, 2, 3, 4],
             "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "simple"
         }],
-        "NumChannels": 3
+        "NumChannels": 15
     },
     "Optimizer": {
         "Name": "adam",
@@ -130,7 +140,7 @@
         "ValSplit": "satlas_root/metadata/train_highres_val.json",
         "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
-        "Name": "bin_segment",
+        "Name": "polyline_bin_segment",
         "Metric": "f1",
         "LabelDir": "satlas_root/datasets/highres/",
         "TrainSplit": "satlas_root/metadata/train_highres_train.json",
@@ -173,9 +183,9 @@
             "PadTo": 512,
             "Mode": "center"
         }],
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "park_type",
         "Metric": "accuracy",
@@ -185,9 +195,9 @@
             "PadTo": 512,
             "Mode": "center"
         }],
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "power_plant_type",
         "Metric": "accuracy",
@@ -197,9 +207,9 @@
             "PadTo": 512,
             "Mode": "center"
         }],
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "quarry_resource",
         "Metric": "accuracy",
@@ -209,9 +219,9 @@
             "PadTo": 512,
             "Mode": "center"
         }],
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "track_sport",
         "Metric": "accuracy",
@@ -221,9 +231,9 @@
             "PadTo": 512,
             "Mode": "center"
         }],
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "road_type",
         "Metric": "accuracy",
@@ -233,6 +243,13 @@
             "PadTo": 512,
             "Mode": "center"
         }],
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "airplane",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
         "TrainSplit": "satlas_root/metadata/train_event_train.json",
         "ValSplit": "satlas_root/metadata/train_event_val.json",
         "TestSplit": "satlas_root/metadata/test_event.json"
@@ -240,11 +257,18 @@
         "Name": "rooftop_solar_panel",
         "Metric": "f1",
         "LabelDir": "satlas_root/datasets/highres/",
-        "TrainSplit": "satlas_root/metadata/train_event_train.json",
-        "ValSplit": "satlas_root/metadata/train_event_val.json",
-        "TestSplit": "satlas_root/metadata/test_event.json"
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
         "Name": "building",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "water_event",
         "Metric": "f1",
         "LabelDir": "satlas_root/datasets/highres/",
         "TrainSplit": "satlas_root/metadata/train_event_train.json",

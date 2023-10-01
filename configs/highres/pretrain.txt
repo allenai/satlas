@@ -1,0 +1,254 @@
+{
+    "Channels": ["tci", "fake", "fake"],
+    "BatchSize": 32,
+    "ValBatchSize": 8,
+
+    "TrainTransforms": [{
+        "Name": "CropFlip",
+        "HorizontalFlip": true,
+        "VerticalFlip": true,
+        "CropMin": 416,
+        "CropMax": 512
+    }, {
+        "Name": "Resize",
+        "ResizeMin": 512,
+        "ResizeMax": 512
+    }, {
+        "Name": "Brightness",
+        "MaxFactor": 0.1,
+        "MaxBias": 16
+    }],
+    "ValTransforms": [{
+        "Name": "Pad",
+        "PadTo": 512,
+        "Mode": "center"
+    }],
+    "TestTransforms": [{
+        "Name": "Pad",
+        "PadTo": 512,
+        "Mode": "center"
+    }],
+
+    "ValMaxTiles": 4096,
+    "TestMaxTiles": 1000000,
+    "NumLoaderWorkers": 4,
+
+    "SavePath": "models/highres/LABEL/",
+    "NumEpochs": 10000,
+    "Model": {
+        "Name": "multihead4",
+        "Backbone": {
+            "Name": "swin",
+            "Arch": "swin_v2_b",
+            "Pretrained": true
+        },
+        "Intermediates": [{
+            "Name": "fpn",
+            "Prepend": true
+        }, {
+            "Name": "upsample"
+        }],
+        "Heads": [{
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple",
+            "Loss": "l1"
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple",
+            "Loss": "l1"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }],
+        "NumChannels": 3
+    },
+    "Optimizer": {
+        "Name": "adam",
+        "InitialLR": 0.00001
+    },
+    "WarmupExamples": 8192,
+    "Scheduler": {
+        "Name": "plateau",
+        "Factor": 0.5,
+        "Patience": 1,
+        "Cooldown": 5,
+        "MinLR": 1e-6
+    },
+    "Half": true,
+    "SummaryExamples": 32768,
+    "TrainSampler": {
+        "Name": "tile_weight",
+        "Weights": "satlas_root/bal_weights/highres.json"
+    },
+    "Tasks": [{
+        "Name": "polygon",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "point",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "polyline_bin_segment",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "land_cover",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "dem",
+        "Metric": "l1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "crop_type",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "tree_cover",
+        "Metric": "l1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_highres_train.json",
+        "ValSplit": "satlas_root/metadata/train_highres_val.json",
+        "TestSplit": "satlas_root/metadata/test_highres.json"
+    }, {
+        "Name": "park_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "park_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "power_plant_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "quarry_resource",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "track_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "road_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "rooftop_solar_panel",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "building",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/highres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }]
+}

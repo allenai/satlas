@@ -1,5 +1,5 @@
 {
-    "Channels": ["tci", "fake", "fake", "b05", "b06", "b07", "b08", "b11", "b12"],
+    "Channels": ["tci", "fake", "fake"],
     "BatchSize": 32,
     "ValBatchSize": 8,
 
@@ -29,13 +29,13 @@
     "TestMaxTiles": 1000000,
     "NumLoaderWorkers": 4,
 
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/sentinel2/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
         "Backbone": {
             "Name": "swin",
-            "Arch": "swin_v2_b",
+            "Arch": "swin_v2_t",
             "Pretrained": true
         },
         "Intermediates": [{
@@ -93,7 +93,8 @@
         }, {
             "Name": "classify",
             "Loss": "cross_entropy"
-        }]
+        }],
+        "NumChannels": 3
     },
     "Optimizer": {
         "Name": "adam",

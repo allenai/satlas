@@ -33,7 +33,7 @@
     "TestMaxTiles": 1000000,
     "NumLoaderWorkers": 4,
 
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/highres/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
@@ -130,7 +130,7 @@
         "ValSplit": "satlas_root/metadata/train_highres_val.json",
         "TestSplit": "satlas_root/metadata/test_highres.json"
     }, {
-        "Name": "polyline_bin_segment",
+        "Name": "bin_segment",
         "Metric": "f1",
         "LabelDir": "satlas_root/datasets/highres/",
         "TrainSplit": "satlas_root/metadata/train_highres_train.json",

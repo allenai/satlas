@@ -31,7 +31,7 @@
 
     "NumImages": 8,
 
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/sentinel2/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",

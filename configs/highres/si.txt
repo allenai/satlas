@@ -1,7 +1,7 @@
 {
     "Channels": ["tci", "fake", "fake"],
-    "BatchSize": 16,
-    "ValBatchSize": 2,
+    "BatchSize": 64,
+    "ValBatchSize": 16,
 
     "TrainTransforms": [{
         "Name": "CropFlip",
@@ -29,22 +29,14 @@
     "TestMaxTiles": 1000000,
     "NumLoaderWorkers": 4,
 
-    "NumImages": 4,
-
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/highres/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
         "Backbone": {
-            "Name": "aggregation",
-            "ImageChannels": 3,
-            "Groups": [[0, 1, 2, 3]],
-            "AggregationOp": "max",
-            "Backbone": {
-                "Name": "swin",
-                "Arch": "swin_v2_b",
-                "Pretrained": true
-            }
+            "Name": "swin",
+            "Arch": "swin_v2_b",
+            "Pretrained": true
         },
         "Intermediates": [{
             "Name": "fpn",
@@ -105,7 +97,7 @@
         }, {
             "Name": "simple"
         }],
-        "NumChannels": 15
+        "NumChannels": 3
     },
     "Optimizer": {
         "Name": "adam",

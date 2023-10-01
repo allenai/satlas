@@ -31,7 +31,7 @@
 
     "NumImages": 8,
 
-    "SavePath": "models/LABEL/",
+    "SavePath": "models/sentinel2/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
@@ -41,8 +41,8 @@
             "Groups": [[0, 1, 2, 3, 4, 5, 6, 7]],
             "AggregationOp": "max",
             "Backbone": {
-                "Name": "swin",
-                "Arch": "swin_v2_b",
+                "Name": "resnet",
+                "Arch": "resnet50",
                 "Pretrained": true
             }
         },

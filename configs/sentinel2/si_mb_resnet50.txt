@@ -1,0 +1,268 @@
+{
+    "Channels": ["tci", "fake", "fake", "b05", "b06", "b07", "b08", "b11", "b12"],
+    "BatchSize": 32,
+    "ValBatchSize": 8,
+
+    "TrainTransforms": [{
+        "Name": "CropFlip",
+        "HorizontalFlip": true,
+        "VerticalFlip": true,
+        "CropMin": 416,
+        "CropMax": 512
+    }, {
+        "Name": "Resize",
+        "ResizeMin": 512,
+        "ResizeMax": 512
+    }],
+    "ValTransforms": [{
+        "Name": "Pad",
+        "PadTo": 512,
+        "Mode": "center"
+    }],
+    "TestTransforms": [{
+        "Name": "Pad",
+        "PadTo": 512,
+        "Mode": "center"
+    }],
+
+    "ValMaxTiles": 4096,
+    "TestMaxTiles": 1000000,
+    "NumLoaderWorkers": 4,
+
+    "SavePath": "models/sentinel2/LABEL/",
+    "NumEpochs": 10000,
+    "Model": {
+        "Name": "multihead4",
+        "Backbone": {
+            "Name": "resnet",
+            "Arch": "resnet50",
+            "Pretrained": true
+        },
+        "Intermediates": [{
+            "Name": "fpn"
+        }, {
+            "Name": "upsample"
+        }],
+        "Heads": [{
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple",
+            "Loss": "l1"
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "simple",
+            "Loss": "l1"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "simple"
+        }, {
+            "Name": "frcnn",
+            "UseLayers": [1, 2, 3, 4],
+            "AnchorSizes": [[32], [64], [128], [256]]
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }, {
+            "Name": "classify",
+            "Loss": "cross_entropy"
+        }]
+    },
+    "Optimizer": {
+        "Name": "adam",
+        "InitialLR": 0.00001
+    },
+    "WarmupExamples": 8192,
+    "Scheduler": {
+        "Name": "plateau",
+        "Factor": 0.5,
+        "Patience": 1,
+        "Cooldown": 5,
+        "MinLR": 1e-6
+    },
+    "Half": true,
+    "SummaryExamples": 32768,
+    "TrainSampler": {
+        "Name": "tile_weight",
+        "Weights": "satlas_root/bal_weights/lowres.json"
+    },
+    "Tasks": [{
+        "Name": "polygon",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json",
+        "ClassMask": ["aquafarm", "lock", "dam", "solar_farm", "power_plant", "park", "parking_garage", "parking_lot", "landfill", "quarry", "stadium", "airport", "airport_apron", "airport_terminal", "ski_resort", "theme_park", "track", "wastewater_plant", "water_park", "crop"]
+    }, {
+        "Name": "point",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json",
+        "ClassMask": ["wind_turbine", "lighthouse", "mineshaft", "aerialway_pylon", "helipad", "communications_tower", "petroleum_well", "water_tower", "power_tower", "offshore_wind_turbine", "offshore_platform"]
+    }, {
+        "Name": "land_cover",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "polyline_bin_segment",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "dem",
+        "Metric": "l1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "crop_type",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "tree_cover",
+        "Metric": "l1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "park_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "park_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "power_plant_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "quarry_resource",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "track_sport",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "road_type",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainTransforms": [{
+            "Name": "Pad",
+            "PadTo": 512,
+            "Mode": "center"
+        }],
+        "TrainSplit": "satlas_root/metadata/train_lowres_train.json",
+        "ValSplit": "satlas_root/metadata/train_lowres_val.json",
+        "TestSplit": "satlas_root/metadata/test_lowres.json"
+    }, {
+        "Name": "wildfire",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "vessel",
+        "Metric": "f1",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "smoke",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }, {
+        "Name": "snow",
+        "Metric": "accuracy",
+        "LabelDir": "satlas_root/datasets/lowres/",
+        "TrainSplit": "satlas_root/metadata/train_event_train.json",
+        "ValSplit": "satlas_root/metadata/train_event_val.json",
+        "TestSplit": "satlas_root/metadata/test_event.json"
+    }]
+}
