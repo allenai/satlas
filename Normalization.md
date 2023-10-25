@@ -16,10 +16,12 @@ Below is an example of downloading an image and preparing it for input into a Sa
 
 First find the longitude and latitude of the location you're interested in, and convert it to a Web-Mercator tile at zoom 16-18. You can use the [Satlas Map](https://satlas.allen.ai/map) and hover your mouse over a point of interest to get its longitude and latitude. To convert to tile using Python:
 
-    import satlas.util
-    longitude = -122.333
-    latitude = 47.646
-    print(satlas.util.geo_to_mercator((longitude, latitude), pixels=1, zoom=17))
+```python
+import satlas.util
+longitude = -122.333
+latitude = 47.646
+print(satlas.util.geo_to_mercator((longitude, latitude), pixels=1, zoom=17))
+```
 
 Get a high-resolution image that you want to apply the model on, e.g. you could download an image from Google Maps by visiting a URL like this:
 
@@ -28,11 +30,13 @@ Get a high-resolution image that you want to apply the model on, e.g. you could 
 
 Let's assume the image is saved as `image.jpg`. Load and normalize the image as follows:
 
-    import torchvision
-    im = torchvision.io.read_image(image_path)
-    im = im.float() / 255
-    # Now you can apply model on the image:
-    # outputs, _ = model([im])
+```python
+import torchvision
+im = torchvision.io.read_image(image_path)
+im = im.float() / 255
+# Now you can apply model on the image:
+# outputs, _ = model([im])
+```
 
 
 Sentinel-2 Images
@@ -63,37 +67,41 @@ First use [scihub.copernicus.eu](https://scihub.copernicus.eu/dhus/) to download
 
 Use gdal to merge the bands across scenes. We include nine bands since we're assuming use of a multi-band model. If you're using a TCI-only model, then just read the TCI band below.
 
-    import glob
-    import os
-    import subprocess
-    channels = ['B08', 'TCI', 'B05', 'B06', 'B07', 'B11', 'B12']
-    fnames = []
-    for scene_name in os.listdir('scenes'):
-        image_fnames = glob.glob(os.path.join('scenes/{}/GRANULE/L1C_*/IMG_DATA/*.jp2'.format(scene_name)))
-        channel_to_fname = {fname.split('_')[-1].split('.')[0]: fname for fname in image_fnames}
-        selected_fnames = [channel_to_fname[channel] for channel in channels]
-        fnames.extend(selected_fnames)
-    subprocess.call([
-        'gdal_merge.py',
-        '-o', 'stack.tif',
-        # Keep bands separate in output file.
-        '-separate',
-    ] + fnames)
+```python
+import glob
+import os
+import subprocess
+channels = ['B08', 'TCI', 'B05', 'B06', 'B07', 'B11', 'B12']
+fnames = []
+for scene_name in os.listdir('scenes'):
+    image_fnames = glob.glob(os.path.join('scenes/{}/GRANULE/L1C_*/IMG_DATA/*.jp2'.format(scene_name)))
+    channel_to_fname = {fname.split('_')[-1].split('.')[0]: fname for fname in image_fnames}
+    selected_fnames = [channel_to_fname[channel] for channel in channels]
+    fnames.extend(selected_fnames)
+subprocess.call([
+    'gdal_merge.py',
+    '-o', 'stack.tif',
+    # Keep bands separate in output file.
+    '-separate',
+] + fnames)
+```
 
 The model expects bands in a different order with TCI first, but we put B08 first so that gdal_merge creates a 10 m/pixel 16-bit output image.
 
 Now load the images, normalize them, and save the result:
 
-    import numpy as np
-    from osgeo import gdal
-    raster = gdal.Open('stack.tif')
-    image = raster.ReadAsArray()
-    # Separate out the different 9-band images.
-    image = image.reshape(3, 9, image.shape[1], image.shape[2])
-    # Re-order bands to the order expected by the model.
-    image = image[:, (1, 2, 3, 4, 5, 6, 0, 7, 8), :, :]
-    # Normalize the non-TCI bands to be 0-255.
-    image[:, 3:9, :, :] = np.clip(image[:, 3:9, :, :]//32, 0, 255)
-    # Save the 8-bit image.
-    image = image.astype(np.uint8)
-    np.save('stack.npy', image)
+```python
+import numpy as np
+from osgeo import gdal
+raster = gdal.Open('stack.tif')
+image = raster.ReadAsArray()
+# Separate out the different 9-band images.
+image = image.reshape(3, 9, image.shape[1], image.shape[2])
+# Re-order bands to the order expected by the model.
+image = image[:, (1, 2, 3, 4, 5, 6, 0, 7, 8), :, :]
+# Normalize the non-TCI bands to be 0-255.
+image[:, 3:9, :, :] = np.clip(image[:, 3:9, :, :]//32, 0, 255)
+# Save the 8-bit image.
+image = image.astype(np.uint8)
+np.save('stack.npy', image)
+```
