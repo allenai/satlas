@@ -70,7 +70,7 @@ We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC
 | NAIP and other high-res, single-image | [highres/old_pretrain.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_pretrain.pth) | Unavailable | Unavailable | Unavailable |
 | NAIP and other high-res, multi-image | [highres/old_mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_mi.pth) | Unavailable | Unavailable | Unavailable |
 | Landsat 8/9, single-image, multi-band | [landsat/si.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/si.pth) | Unavailable | Unavailable | Unavailable |
-| Landsat 8/9, multi-image, multi-band | [landsat/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/mi.pth) Unavailable | Unavailable | Unavailable |
+| Landsat 8/9, multi-image, multi-band | [landsat/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/mi.pth) | Unavailable | Unavailable | Unavailable |
 | Sentinel-1, single-image, vh+vv | [sentinel1/si.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel1/si.pth) | Unavailable | Unavailable | Unavailable |
 | Sentinel-1, multi-image, vh+vv | [sentinel1/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel1/mi.pth) | Unavailable | Unavailable | Unavailable |
 
