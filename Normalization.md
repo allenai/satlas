@@ -105,3 +105,19 @@ image[:, 3:9, :, :] = np.clip(image[:, 3:9, :, :]//32, 0, 255)
 image = image.astype(np.uint8)
 np.save('stack.npy', image)
 ```
+
+
+Landsat Images
+--------------
+
+Our Landsat models input 11 bands, B1-B11 in order, of Landsat-8 and Landsat-9 images.
+
+Each band is originally a 16-bit image. We normalize a pixel value N to 0-1 by clipping (N-4000)/16320 to 0-1.
+
+
+Sentinel-1 Images
+-----------------
+
+Our Sentinel-1 models input 2 bands, vh then vv, of Level-1 GRD IW vh+vv products only (10 m pixel spacing).
+
+Each band is originally a 16-bit image. We normalize a pixel value N to 0-1 by clipping N/255 to 0-1 (any pixel values greater than 255 become 1).
