@@ -45,6 +45,11 @@ Small versions of the NAIP and Sentinel-2 images are available. These can be use
     ln -s sentinel2_small sentinel2
     ln -s naip_small naip
 
+Although not part of the original paper, we have also prepared Landsat and Sentinel-1 images in 2022 corresponding to the static labels in the dataset:
+
+    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-landsat.tar
+    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-sentinel1.tar
+
 SatlasPretrain includes images and labels from the sources below, re-distributed under the original licenses.
 For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf).
 
