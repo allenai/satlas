@@ -141,7 +141,7 @@ In this example we will apply a multi-image multi-band Sentinel-2 model on Senti
 If you don't have Sentinel-2 images merged and normalized for Satlas already, [see the example](Normalization.md#sentinel-2-images).
 The example also documents the normalization of Sentinel-2 bands expected by our models.
 
-We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [sentinel2/old_si_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_si_mb.pth) (the SatlasPretrain model) instead.
+We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [sentinel2/old_si_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_si_mb.pth) (the SatlasPretrain model) instead. The number of expected input images varies by model and is specified under `NumImages` in the corresponding configuration file (see [configs folder](https://github.com/allenai/satlas/tree/main/configs)).
 
 First obtain the code and the model:
 

@@ -56,13 +56,13 @@ Below is an example of downloading three Sentinel-2 images, normalizing the band
 
 ### Sentinel-2 Example
 
-First use [scihub.copernicus.eu](https://scihub.copernicus.eu/dhus/) to download three Sentinel-2 scenes of the same location.
+First use [scihub.copernicus.eu](https://scihub.copernicus.eu/dhus/) to download multiple Sentinel-2 scenes of the same location. The number of scenes expected varies by model, and is specified by `NumImages` in the configuration file (e.g. in [mi_mb_base.txt](https://github.com/allenai/satlas/blob/main/configs/sentinel2/mi_mb_base.txt) or [satlas_explorer_solar_farm.txt](https://github.com/allenai/satlas/blob/main/configs/satlas_explorer_solar_farm.txt)).
 
 1. Create an account using the profile icon in the top-right.
 2. Zoom in on a location of interest, and use the rectangle tool (middle right, the square with dotted lines icon) to draw a rectangle.
 3. Open the filters (three horizontal bars icon) in the top-left, check "Mission: Sentinel-2", and select S2MSI1C for product type. Optionally limit cloud cover to "[0 TO 20]" or similar. Optionally add start/end times under Sensing Period.
 4. Press the search button. You should see a list of Sentinel-2 scenes, and when you hover over one of them it should highlight the scene on the map.
-5. Find three scenes covering the same geographic extent (based on what's highlighted in the map when you hover over that item in the product list) and download them.
+5. Find multiple scenes covering the same geographic extent (based on what's highlighted in the map when you hover over that item in the product list) and download them.
 6. Unzip the files into `scenes/`.
 
 Use gdal to merge the bands across scenes. We include nine bands since we're assuming use of a multi-band model. If you're using a TCI-only model, then just read the TCI band below.
@@ -96,7 +96,7 @@ from osgeo import gdal
 raster = gdal.Open('stack.tif')
 image = raster.ReadAsArray()
 # Separate out the different 9-band images.
-image = image.reshape(3, 9, image.shape[1], image.shape[2])
+image = image.reshape(-1, 9, image.shape[1], image.shape[2])
 # Re-order bands to the order expected by the model.
 image = image[:, (1, 2, 3, 4, 5, 6, 0, 7, 8), :, :]
 # Normalize the non-TCI bands to be 0-255.
