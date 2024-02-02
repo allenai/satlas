@@ -74,11 +74,11 @@ For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub
 - [NOAA Lidar Scans](https://coast.noaa.gov/digitalcoast/data/coastallidar.html): public domain
 - New annotation for SatlasPretrain: we release these labels under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense).
 
-#### Model Weights
+### Model Weights
 
 We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense):
 
-##### Sentinel-2 Pretrained Models
+#### Sentinel-2 Pretrained Models
 |  | Single-image, RGB | Multi-image, RGB |
 | ---------- | ------------ | ------------ |
 | **Swin-v2-Base** | [Sentinel2_SwinB_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_si_rgb.pth?download=true) | [Sentinel2_SwinB_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_rgb.pth?download=true) |
@@ -92,17 +92,17 @@ We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC
 | **Resnet50** | [Sentinel2_Resnet50_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swint_si_ms.pth?download=true) | |
 | **Resnet152** | [Sentinel2_Resnet152_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_si_ms.pth?download=true) | |
 
-##### Sentinel-1 Pretrained Models
+#### Sentinel-1 Pretrained Models
 |  | Single-image, VH+VV | Multi-image, VH+VV |
 | ---------- | ------------ | ------------ |
 | **Swin-v2-Base** | [Sentinel1_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_si.pth?download=true) | [Sentinel1_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_mi.pth?download=true) |
 
-##### Landsat 8/9 Pretrained Models
+#### Landsat 8/9 Pretrained Models
 |  | Single-image, all bands | Multi-image, all bands |
 | ---------- | ------------ | ------------ |
 | **Swin-v2-Base** | [Landsat_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_si.pth?download=true) | [Landsat_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_mi.pth?download=true) |
 
-##### Aerial (0.5-2m/px high-res imagery) Pretrained Models
+#### Aerial (0.5-2m/px high-res imagery) Pretrained Models
 |  | Single-image, RGB | Multi-image, RGB |
 | ---------- | ------------ | ------------ |
 | **Swin-v2-Base** | [Aerial_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_si.pth?download=true) | [Aerial_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_mi.pth?download=true) |
