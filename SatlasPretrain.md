@@ -1,7 +1,10 @@
 SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (ICCV 2023)
 ----------------------------------------------------------------------------------------
 
-[[SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf) | [Satlas Website](https://satlas.allen.ai/)]
+[SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf)
+
+Overview
+---------
 
 SatlasPretrain is a large-scale pre-training dataset for remote sensing image understanding.
 
@@ -9,12 +12,21 @@ It consists of 302M labels under 137 categories and seven label types: points, p
 
 Pre-training on SatlasPretrain increases average performance on seven downstream tasks by 18% over ImageNet and 6% over [DOTA](https://captain-whu.github.io/DOTA/index.html) and [iSAID](https://captain-whu.github.io/iSAID/).
 
-Both the dataset and pre-trained models weights can be downloaded below.
 
-Download
+SatlasPretrain Foundation Models
+--------------------------------
+
+We have trained models on SatlasPretrain, with 4 different image modalities (Sentinel-2, Sentinel-1, Landsat 8/9, and aerial imagery). 
+
+The resulting remote sensing foundation models have been released and can be easily loaded using the `satlaspretrain_models` pip package.
+
+You can find detailed documentation [here](https://github.com/allenai/satlaspretrain_models/tree/main).
+
+
+SatlasPretrain Dataset
 --------
 
-### SatlasPretrain Dataset
+## Download
 
 Satlas consists of Sentinel-2 images, NAIP images, corresponding labels, and metadata which can be downloaded as follows:
 
@@ -66,28 +78,38 @@ For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub
 
 We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense):
 
-| Image Type | Swin-v2-Base | Swin-v2-Tiny | Resnet50 | Resnet152 |
-| ---------- | ------------ | ------------ | -------- | --------- |
-| Sentinel-2, single-image, RGB | [sentinel2/si_sb_base.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_base.pth) | [sentinel2/si_sb_tiny.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_tiny.pth) | [sentinel2/si_sb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_resnet50.pth) | [sentinel2/si_sb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_sb_resnet152.pth) |
-| Sentinel-2, single-image, multi-band | [sentinel2/old_si_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_si_mb.pth) | [sentinel2/si_mb_tiny.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_tiny.pth) | [sentinel2/si_mb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_resnet50.pth) | [sentinel2/si_mb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/si_mb_resnet152.pth) |
-| Sentinel-2, multi-image, RGB | [sentinel2/old_mi_sb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_mi_sb.pth) | Unavailable | [sentinel2/mi_sb_resnet50.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/mi_sb_resnet50.pth) | [sentinel2/mi_sb_resnet152.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/mi_sb_resnet152.pth) |
-| Sentinel-2, multi-image, multi-band | [sentinel2/old_mi_mb.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel2/old_mi_mb.pth) | Unavailable | Unavailable | Unavailable |
-| NAIP and other high-res, single-image | [highres/old_pretrain.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_pretrain.pth) | Unavailable | Unavailable | Unavailable |
-| NAIP and other high-res, multi-image | [highres/old_mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_mi.pth) | Unavailable | Unavailable | Unavailable |
-| Landsat 8/9, single-image, multi-band | [landsat/si.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/si.pth) | Unavailable | Unavailable | Unavailable |
-| Landsat 8/9, multi-image, multi-band | [landsat/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/landsat/mi.pth) | Unavailable | Unavailable | Unavailable |
-| Sentinel-1, single-image, vh+vv | [sentinel1/si.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel1/si.pth) | Unavailable | Unavailable | Unavailable |
-| Sentinel-1, multi-image, vh+vv | [sentinel1/mi.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/sentinel1/mi.pth) | Unavailable | Unavailable | Unavailable |
+#### Sentinel-2 Pretrained Models
+|  | Single-image, RGB | Multi-image, RGB |
+| ---------- | ------------ | ------------ |
+| **Swin-v2-Base** | [Sentinel2_SwinB_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_si_rgb.pth?download=true) | [Sentinel2_SwinB_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_rgb.pth?download=true) |
+| **Swin-v2-Tiny** | [Sentinel2_SwinT_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swint_si_rgb.pth?download=true) | |
+| **Resnet50** | [Sentinel2_Resnet50_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet50_si_rgb.pth?download=true) | [Sentinel2_Resnet50_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet50_mi_rgb.pth?download=true) |
+| **Resnet152** | [Sentinel2_Resnet152_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_si_rgb.pth?download=true) | [Sentinel2_Resnet152_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_mi_rgb.pth?download=true) |
 
-Single-image models learn strong representations for individual satellite or aerial images, while multi-image models use multiple image captures of the same location for added robustness when making predictions about static objects. In multi-image models, feature maps from the backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. See [ModelArchitecture.md](ModelArchitecture.md) for more details.
+|  | Single-image, MS | Multi-image, MS |
+| ---------- | ------------ | ------------ |
+| **Swin-v2-Base** | [Sentinel2_SwinB_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_si_ms.pth?download=true) | [Sentinel2_SwinB_MI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_ms.pth?download=true) |
+| **Resnet50** | [Sentinel2_Resnet50_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swint_si_ms.pth?download=true) | |
+| **Resnet152** | [Sentinel2_Resnet152_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_si_ms.pth?download=true) | |
 
-Sentinel-2 RGB models input B2, B3, and B4 only, while the multi-band models input 9 bands (see [Normalization.md](Normalization.md#sentinel-2-images) for details). NAIP models input RGB aerial images, and we have found them to be effective on aerial imagery from a variety of sources and datasets. Landsat models input B1-B11 (all bands).
+#### Sentinel-1 Pretrained Models
+|  | Single-image, VH+VV | Multi-image, VH+VV |
+| ---------- | ------------ | ------------ |
+| **Swin-v2-Base** | [Sentinel1_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_si.pth?download=true) | [Sentinel1_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_mi.pth?download=true) |
 
-These documents are useful for using the models:
+#### Landsat 8/9 Pretrained Models
+|  | Single-image, all bands | Multi-image, all bands |
+| ---------- | ------------ | ------------ |
+| **Swin-v2-Base** | [Landsat_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_si.pth?download=true) | [Landsat_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_mi.pth?download=true) |
 
-- [Normalization.md](Normalization.md) documents how images should be normalized for input to the models.
-- [See an example of applying the model and visualizing its outputs.](CustomInference.md#sentinel-2-inference-example)
-- If you plan to fine-tune the backbone for downstream tasks, [see the example on loading the backbone and extracting feature maps.](CustomInference.md#extracting-representations-example)
+#### Aerial (0.5-2m/px high-res imagery) Pretrained Models
+|  | Single-image, RGB | Multi-image, RGB |
+| ---------- | ------------ | ------------ |
+| **Swin-v2-Base** | [Aerial_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_si.pth?download=true) | [Aerial_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_mi.pth?download=true) |
+
+*Single-image* models learn strong representations for individual satellite or aerial images, while *multi-image* models use multiple image captures of the same location for added robustness when making predictions about static objects. In *multi-image* models, feature maps from the backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. See [ModelArchitecture.md](ModelArchitecture.md) for more details.
+
+Sentinel-2 *RGB* models input the B2, B3, and B4 bands only, while the multi-spectral (*MS*) models input 9 bands (see [Normalization.md](Normalization.md#sentinel-2-images) for details). The aerial (0.5-2m/px high-res imagery) models input *RGB* NAIP and other high-res images, and we have found them to be effective on aerial imagery from a variety of sources and datasets. Landsat models input B1-B11 (*all bands*). Sentinel-1 models input *VV and VH* bands.
 
 The models correspond to configuration files with the same name, e.g. `sentinel2/si_sb_base.pth` is trained using `configs/sentinel2/si_sb_base.txt`. The model weights can be used to compute outputs and stats on the SatlasPretrain validation set, e.g.:
 
