@@ -1,9 +1,9 @@
-# SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (ICCV 2023)
+SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (ICCV 2023)
 ----------------------------------------------------------------------------------------
 
 [SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf)
 
-## Overview
+Overview
 ---------
 
 SatlasPretrain is a large-scale pre-training dataset for remote sensing image understanding.
@@ -117,8 +117,7 @@ The models correspond to configuration files with the same name, e.g. `sentinel2
 
 
 
-Dataset Structure
------------------
+### Dataset Structure
 
 SatlasPretrain is divided into high-resolution and low-resolution image modes.
 Each image mode has its own train and test split, although dynamic labels have separate files defining how tiles are split than the slow-changing labels.
@@ -132,14 +131,14 @@ The splits are defined by JSON files that contain list of (col, row) pairs:
 - satlas/metadata/test_event.json
 
 
-### Tile System
+#### Tile System
 
 Images and labels are both projected to [Web-Mercator](https://en.wikipedia.org/wiki/Web_Mercator_projection) and stored at zoom level 13.
 This means the world is divided into a grid with 2^13 rows and 2^13 columns.
 The high-resolution images are stored at zoom level 17.
 
 
-### Images
+#### Images
 
 For low-resolution image mode, there are:
 
@@ -181,7 +180,7 @@ So `satlas/sentinel2/ABC/tci/1867_3287.png` is a 512x512 image corresponding to 
 `1867_3288.png` is the image at the next row down.
 
 
-### Coordinates
+#### Coordinates
 
 The `geo_to_mercator` and `mercator_to_geo` functions in `satlas.util` translate from tile coordinates like (1867, 3287) to longitude-latitude coordinates like (33.4681, -97.9541).
 
@@ -189,7 +188,7 @@ The `geo_to_mercator` and `mercator_to_geo` functions in `satlas.util` translate
     satlas.util.mercator_to_geo((1867, 3287), pixels=1, zoom=13)
 
 
-### Labels
+#### Labels
 
 Satlas consists of slow-changing labels, which should correspond to the most recent image at each tile, and dynamic labels, which reference a specific image/time.
 
@@ -301,7 +300,7 @@ Note that only a subset of categories are annotated in each label folder. Oftent
 If the category is not annotated at all, then it will omit the key in `vector.json` entirely (or, for segmentation and regression labels, omit the PNG image like no `land_cover.png`).
 
 
-### Other Files
+#### Other Files
 
 Additional files in `satlas/metadata/` contain extra data.
 
@@ -311,7 +310,7 @@ Additional files in `satlas/metadata/` contain extra data.
 - The various `good_images_X.json` files enumerate images that have few cloudy or missing (black) pixels.
 
 
-### Predicting non-Property Labels
+#### Predicting non-Property Labels
 
 For predicting label types other than properties, the following data from the labels folder can be used:
 
@@ -321,7 +320,7 @@ For predicting label types other than properties, the following data from the la
 - Label folder name (must only be used for creating identically named output folder)
 
 
-### Predicting Property and Classification Labels
+#### Predicting Property and Classification Labels
 
 For property and classification labels, the entirety of `vector.json` except the property values can also be used.
 
@@ -330,7 +329,7 @@ Thus, the model can use the coordinates of points, polygons, and polylines like 
 The output should be a new version of `vector.json` with the same features but with the property values filled in based on the model predictions.
 
 
-### Evaluation
+#### Evaluation
 
 The output format is essentially identical to the format of labels in Satlas. For each label folder like `static/1434_3312/` or `dynamic/1434_3312/airplane_325/`, a corresponding output `outputs/1434_3312/` or `outputs/1434_3312/airplane_325/` should be produced.
 
@@ -341,8 +340,7 @@ The output format is essentially identical to the format of labels in Satlas. Fo
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality raster --split path/to/satlas/metadata/test_highres.json --format static
 
 
-Training
----------
+## Training
 
 ### Prepare Datasets
 
@@ -384,8 +382,7 @@ With visualization:
     python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/
 
 
-Fine-tuning
------------
+## Fine-tuning
 
 The code in this repository can also be used to replicate the experiments on downstream datasets. Download the downstream datasets:
 
