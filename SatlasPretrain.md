@@ -13,7 +13,7 @@ Pre-training on SatlasPretrain increases average performance on seven downstream
 SatlasPretrain Foundation Models
 --------------------------------
 
-[Foundation models pre-trained on SatlasPretrain are available for download](https://github.com/allenai/satlaspretrain_models/) for each of these image modalities:
+Foundation models pre-trained on SatlasPretrain are [available for download](https://github.com/allenai/satlaspretrain_models/) for each of these image modalities:
 
 - Sentinel-2
 - Sentinel-1
