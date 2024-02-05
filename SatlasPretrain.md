@@ -3,9 +3,6 @@ SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (IC
 
 [SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf)
 
-Overview
----------
-
 SatlasPretrain is a large-scale pre-training dataset for remote sensing image understanding.
 
 It consists of 302M labels under 137 categories and seven label types: points, polygons, polylines, properties, segmentation labels, regression labels, and classification labels.
@@ -16,15 +13,23 @@ Pre-training on SatlasPretrain increases average performance on seven downstream
 SatlasPretrain Foundation Models
 --------------------------------
 
-We have trained models on SatlasPretrain, with 4 different image modalities (Sentinel-2, Sentinel-1, Landsat 8/9, and aerial imagery). 
+[Foundation models pre-trained on SatlasPretrain are available for download](https://github.com/allenai/satlaspretrain_models/) for each of these image modalities:
 
-The resulting remote sensing foundation models have been released and can be easily loaded using the `satlaspretrain_models` pip package.
+- Sentinel-2
+- Sentinel-1
+- Landsat 8/9
+- 0.5 - 2 m/pixel aerial imagery
 
-You can find detailed documentation [here](https://github.com/allenai/satlaspretrain_models/tree/main).
+The models are released under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense).
+
+The [satlaspretrain_models package](https://github.com/allenai/satlaspretrain_models/) provides an easy way to download and initialize these models so that they can be fine-tuned for downstream applications.
+[This tutorial](TODO1) (link TODO1) details how to use the package to fine-tune a model on XYZ.
+
+The foundation models are also available in [TorchGeo](TODO2) (link TODO2), a library for training remote sensing models in PyTorch. [See our usage guide.](TODO2)
 
 
 SatlasPretrain Dataset
---------
+----------------------
 
 ### Download
 
@@ -73,48 +78,6 @@ For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub
 - [WorldCover](https://esa-worldcover.org/): CC-BY-4.0
 - [NOAA Lidar Scans](https://coast.noaa.gov/digitalcoast/data/coastallidar.html): public domain
 - New annotation for SatlasPretrain: we release these labels under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense).
-
-### Model Weights
-
-We release weights for SatlasNet models pre-trained on SatlasPretrain under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense):
-
-#### Sentinel-2 Pretrained Models
-|  | Single-image, RGB | Multi-image, RGB |
-| ---------- | ------------ | ------------ |
-| **Swin-v2-Base** | [Sentinel2_SwinB_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_si_rgb.pth?download=true) | [Sentinel2_SwinB_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_rgb.pth?download=true) |
-| **Swin-v2-Tiny** | [Sentinel2_SwinT_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swint_si_rgb.pth?download=true) | |
-| **Resnet50** | [Sentinel2_Resnet50_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet50_si_rgb.pth?download=true) | [Sentinel2_Resnet50_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet50_mi_rgb.pth?download=true) |
-| **Resnet152** | [Sentinel2_Resnet152_SI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_si_rgb.pth?download=true) | [Sentinel2_Resnet152_MI_RGB](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_mi_rgb.pth?download=true) |
-
-|  | Single-image, MS | Multi-image, MS |
-| ---------- | ------------ | ------------ |
-| **Swin-v2-Base** | [Sentinel2_SwinB_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_si_ms.pth?download=true) | [Sentinel2_SwinB_MI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_ms.pth?download=true) |
-| **Resnet50** | [Sentinel2_Resnet50_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swint_si_ms.pth?download=true) | |
-| **Resnet152** | [Sentinel2_Resnet152_SI_MS](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_resnet152_si_ms.pth?download=true) | |
-
-#### Sentinel-1 Pretrained Models
-|  | Single-image, VH+VV | Multi-image, VH+VV |
-| ---------- | ------------ | ------------ |
-| **Swin-v2-Base** | [Sentinel1_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_si.pth?download=true) | [Sentinel1_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel1_swinb_mi.pth?download=true) |
-
-#### Landsat 8/9 Pretrained Models
-|  | Single-image, all bands | Multi-image, all bands |
-| ---------- | ------------ | ------------ |
-| **Swin-v2-Base** | [Landsat_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_si.pth?download=true) | [Landsat_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/landsat_swinb_mi.pth?download=true) |
-
-#### Aerial (0.5-2m/px high-res imagery) Pretrained Models
-|  | Single-image, RGB | Multi-image, RGB |
-| ---------- | ------------ | ------------ |
-| **Swin-v2-Base** | [Aerial_SwinB_SI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_si.pth?download=true) | [Aerial_SwinB_MI](https://huggingface.co/allenai/satlas-pretrain/resolve/main/aerial_swinb_mi.pth?download=true) |
-
-*Single-image* models learn strong representations for individual satellite or aerial images, while *multi-image* models use multiple image captures of the same location for added robustness when making predictions about static objects. In *multi-image* models, feature maps from the backbone are passed through temporal max pooling, so the backbone itself is still applied on individual images, but is trained to provide strong representations after the temporal max pooling step. See [ModelArchitecture.md](ModelArchitecture.md) for more details.
-
-Sentinel-2 *RGB* models input the B2, B3, and B4 bands only, while the multi-spectral (*MS*) models input 9 bands (see [Normalization.md](Normalization.md#sentinel-2-images) for details). The aerial (0.5-2m/px high-res imagery) models input *RGB* NAIP and other high-res images, and we have found them to be effective on aerial imagery from a variety of sources and datasets. Landsat models input B1-B11 (*all bands*). Sentinel-1 models input *VV and VH* bands.
-
-The models correspond to configuration files with the same name, e.g. `sentinel2/si_sb_base.pth` is trained using `configs/sentinel2/si_sb_base.txt`. The model weights can be used to compute outputs and stats on the SatlasPretrain validation set, e.g.:
-
-    python -m satlas.cmd.model.infer --config_path configs/sentinel2/si_sb_base.txt --weights models/sentinel2/si_sb_base.pth --details --vis_dir vis/
-
 
 
 ### Dataset Structure
@@ -340,7 +303,7 @@ The output format is essentially identical to the format of labels in Satlas. Fo
     python -m satlas.cmd.evaluate --gt_path path/to/satlas/static/ --pred_path path/to/outputs/ --modality raster --split path/to/satlas/metadata/test_highres.json --format static
 
 
-## Training
+## Training Models on SatlasPretrain
 
 ### Prepare Datasets
 
@@ -358,7 +321,7 @@ Can then visualize these datasets:
 
     python -m satlas.cmd.vis --path satlas_root/datasets/highres/polygon/ --task polygon --out_path ~/vis/
 
-The format of these datasets is detailed in [DatasetSpec.md](DatasetSpec.md).
+The format of the prepared datasets is detailed in [DatasetSpec.md](DatasetSpec.md).
 
 ### Train Model
 
@@ -369,20 +332,24 @@ Compute weights for each example that balance based on inverse of category frequ
 
 Then train the models:
 
-    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/highres_joint.txt --world_size 8
-    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/lowres_joint.txt --world_size 8
+    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/aerial/swinb_si_pretrain.txt --world_size 8
+    python -m torch.distributed.launch --nproc_per_node=8 --master_port 29500 -m satlas.cmd.model.train --config_path configs/sentinel2/swinb_si_rgb.txt --world_size 8
 
 ## Infer and Evaluate Model
 
-    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --details
-    python -m satlas.cmd.model.infer --config_path configs/lowres_joint.txt --details
+First, train a model using the steps above or download a pre-trained checkpoint from [satlaspretrain_models](https://github.com/allenai/satlaspretrain_models/?tab=readme-ov-file#available-pretrained-models-model_ids).
+
+Then, run:
+
+    python -m satlas.cmd.model.infer --config_path configs/aerial/swinb_si_pretrain.txt --details
+    python -m satlas.cmd.model.infer --config_path configs/sentinel2/swinb_si_rgb.txt --details
 
 With visualization:
 
-    python -m satlas.cmd.model.infer --config_path configs/highres_joint.txt --task polygon --details --vis_dir ~/vis/
+    python -m satlas.cmd.model.infer --config_path configs/aerial/swinb_si_pretrain.txt --task polygon --details --vis_dir ~/vis/
 
 
-## Fine-tuning
+## Replicating Downstream Performance Experiments
 
 The code in this repository can also be used to replicate the experiments on downstream datasets. Download the downstream datasets:
 
@@ -396,7 +363,19 @@ Example configuration files for 50 training examples are included, e.g.:
     python -m satlas.cmd.model.infer --config_path satlaspretrain_finetune/configs/aid_satlas_50.txt --details
     python -m satlas.cmd.model.infer --config_path satlaspretrain_finetune/configs/aid_imagenet_50.txt --details
 
-The "satlas" configuration files specify `RestorePath` that loads SatlasPretrain weights. `TrainMaxTiles` can be updated for different numbers of training examples.
+The "satlas" configuration files specify `RestorePath` that loads SatlasPretrain weights (`models/aerial/swinb_si/best.pth`). `TrainMaxTiles` can be updated for different numbers of training examples.
+
+
+## Visualizing Outputs on New Images
+
+SatlasPretrain foundation models are pre-trained on many tasks (137 categories), so although they are great for computing representations or for fine-tuning on downstream tasks, their performance on the pre-training tasks is not amazing.
+
+Nevertheless, you can use the code here to apply the models on new images. First, you will need to download a model and identify the corresponding configuration file:
+
+1. Download the model from [satlaspretrain_models](https://github.com/allenai/satlaspretrain_models/?tab=readme-ov-file#available-pretrained-models-model_ids), e.g. `sentinel2_swinb_si_rgb.pth`.
+2. The configuration file has a corresponding name, e.g. `configs/sentinel2/swinb_si_rgb.txt`.
+
+Now you can [follow this example of applying the model and visualizing its outputs](https://github.com/allenai/satlas/blob/main/CustomInference.md#sentinel-2-inference-example).
 
 
 Authors
