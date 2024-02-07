@@ -23,9 +23,7 @@ Foundation models pre-trained on SatlasPretrain are [available for download](htt
 The models are released under [ODC-BY](https://github.com/allenai/satlas/blob/main/DataLicense).
 
 The [satlaspretrain_models package](https://github.com/allenai/satlaspretrain_models/) provides an easy way to download and initialize these models so that they can be fine-tuned for downstream applications.
-[This tutorial](TODO1) (link TODO1) details how to use the package to fine-tune a model on XYZ.
-
-The foundation models are also available in [TorchGeo](TODO2) (link TODO2), a library for training remote sensing models in PyTorch. [See our usage guide.](TODO2)
+[This tutorial](https://github.com/allenai/satlaspretrain_models/blob/main/demo.ipynb) details how to use the package to fine-tune a model on EuroSAT.
 
 
 SatlasPretrain Dataset
