@@ -5,13 +5,11 @@ Satlas: Open AI-Generated Geospatial Data
 
 For an introduction to Satlas, see https://satlas.allen.ai/.
 
-This repository includes:
-- Download the training data, including [SatlasPretrain](SatlasPretrain.md), a large-scale remote sensing dataset.
-- Download the pre-trained model weights.
-- Training and inference code.
-- [Download the AI-generated geospatial data](GeospatialDataProducts.md) for offline analysis.
-
-Satlas super-resolution code is in [another repository](https://github.com/allenai/satlas-super-resolution).
+Quick links:
+- [Download SatlasPretrain](SatlasPretrain.md), our large-scale remote sensing dataset.
+- [Download and fine-tune our foundation models for remote sensing](https://github.com/allenai/satlaspretrain_models/). These models are pre-trained on SatlasPretrain.
+- [Download the AI-generated geospatial data](GeospatialDataProducts.md) in Satlas for offline analysis.
+- [Access Satlas super-resolution data and code](https://github.com/allenai/satlas-super-resolution)
 
 
 Overview
@@ -39,7 +37,7 @@ It contains 302M labels under 137 categories, collected through a combination of
 
 Pre-training on SatlasPretrain helps to improve the downstream performance of our models when fine-tuning on the smaller sets of task-specific labels.
 
-See https://satlas-pretrain.allen.ai/ for more information on SatlasPretrain, or [download the dataset and pre-trained models](SatlasPretrain.md).
+See https://satlas-pretrain.allen.ai/ for more information on SatlasPretrain. You can also [download the dataset](SatlasPretrain.md) or [download and fine-tune the pre-trained models](https://github.com/allenai/satlaspretrain_models/).
 
 ### Task-Specific Labels and Model Weights
 

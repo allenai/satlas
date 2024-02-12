@@ -33,7 +33,7 @@
     "TestMaxTiles": 1000000,
     "NumLoaderWorkers": 4,
 
-    "SavePath": "models/highres/LABEL/",
+    "SavePath": "models/aerial/LABEL/",
     "NumEpochs": 10000,
     "Model": {
         "Name": "multihead4",
