@@ -10,6 +10,7 @@ Quick links:
 - [Download and fine-tune our foundation models for remote sensing](https://github.com/allenai/satlaspretrain_models/). These models are pre-trained on SatlasPretrain.
 - [Download the AI-generated geospatial data](GeospatialDataProducts.md) in Satlas for offline analysis.
 - [Access Satlas super-resolution data and code](https://github.com/allenai/satlas-super-resolution)
+- [View ongoing Satlas projects](OngoingProjects.md)
 
 
 Overview
