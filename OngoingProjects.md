@@ -6,7 +6,7 @@ Note that all timelines are estimates, and as projects develop there may be dela
 ## Recent Updates
 
 - 16 February 2024: added this page.
-- 6 February 2024: released the [`satlaspretrain_models` package] to easily apply SatlasPretrain foundation models for downstream tasks.
+- 6 February 2024: released the [`satlaspretrain_models` package](https://github.com/allenai/satlaspretrain_models/) to easily apply SatlasPretrain foundation models for downstream tasks.
 
 
 ## SatlasPretrain Ease-of-use (ongoing, 75%)
