@@ -1,0 +1,16 @@
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-a.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-b.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel1.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2011.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2012.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2013.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2014.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2015.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2016.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2017.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2018.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2019.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2020.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-dynamic.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-static.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-metadata.tar

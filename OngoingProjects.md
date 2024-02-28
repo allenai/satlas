@@ -5,6 +5,8 @@ Note that all timelines are estimates, and as projects develop there may be dela
 
 ## Recent Updates
 
+- 28 February 2024: an additional download option for the SatlasPretrain dataset is now available via [Hugging Face](https://huggingface.co/allenai/satlas-pretrain)
+- 27 February 2024: renewable energy infrastructure and marine infrastructure data through 2024-01 is now available [from the data products page](https://github.com/allenai/satlas/blob/main/GeospatialDataProducts.md). The shapefile downloads are also fixed.
 - 16 February 2024: added this page.
 - 6 February 2024: released the [`satlaspretrain_models` package](https://github.com/allenai/satlaspretrain_models/) to easily apply SatlasPretrain foundation models for downstream tasks.
 
@@ -14,8 +16,8 @@ Note that all timelines are estimates, and as projects develop there may be dela
 Make it easier for users to apply SatlasPretrain foundation models for downstream tasks.
 
 - So far we have released the [`satlaspretrain_models` package](https://github.com/allenai/satlaspretrain_models/) and [accompanying tutorial](https://github.com/allenai/satlaspretrain_models/blob/main/demo.ipynb).
+- We have also made the SatlasPretrain dataset available on Hugging Face at https://huggingface.co/allenai/satlas-pretrain
 - We plan to make the models available in [TorchGeo](https://github.com/microsoft/torchgeo) too (expected March 2024).
-- We are also working to make the dataset available on Huggingface (expected March 2024). Currently it can be downloaded for free from an S3 bucket but some users have slow download speed.
 
 
 ## satlas.allen.ai 2023 Data (ongoing, 75%)
@@ -24,7 +26,7 @@ Add 2023 data to [satlas.allen.ai](https://satlas.allen.ai/).
 This has previously been delayed as we observed reduced model accuracy at high latitudes and worked to improve the models.
 
 - Renewable energy infrastructure and marine infrastructure data can already be downloaded through 2023-08 [from the data products page](https://github.com/allenai/satlas/blob/main/GeospatialDataProducts.md).
-- Release of data through 2024-01 is ongoing (expected February 2024).
+- Release of data through 2024-01 is completed.
 - Updated website is ongoing (expected March 2024).
 
 

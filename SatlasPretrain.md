@@ -31,39 +31,14 @@ SatlasPretrain Dataset
 
 ### Download
 
-Satlas consists of Sentinel-2 images, NAIP images, corresponding labels, and metadata which can be downloaded as follows:
+Satlas consists of 300M+ labels and corresponding Sentinel-2, Sentinel-1, Landsat, and NAIP images. The dataset can be downloaded from either of these options:
 
-    cd satlas_root/
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-a.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-b.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel1.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2011.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2012.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2013.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2014.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2015.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2016.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2017.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2018.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2019.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2020.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-dynamic.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-static.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-metadata.tar
-    ls | grep tar | xargs -L 1 tar xvf
+- [S3 bucket](satlaspretrain_urls.txt)
+- [Hugging Face](https://huggingface.co/allenai/satlas-pretrain/tree/main/dataset)
 
-Small versions of the NAIP and Sentinel-2 images are available. These can be used in conjunction with the labels and metadata above.
+Use e.g. `ls | grep tar | xargs -L 1 tar xvf` to extract the tar files.
 
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-small.tar
-    wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-small.tar
-    ls | grep tar | xargs -L 1 tar xvf
-    ln -s sentinel2_small sentinel2
-    ln -s naip_small naip
-
-Although not part of the original paper, we have also prepared Landsat and Sentinel-1 images in 2022 corresponding to the static labels in the dataset:
-
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-landsat.tar
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-sentinel1.tar
+Small versions of the NAIP and Sentinel-2 images [are available](satlaspretrain_urls_small.txt) for testing. These can be used in conjunction with the labels and metadata from the downloads above.
 
 SatlasPretrain includes images and labels from the sources below, re-distributed under the original licenses.
 For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf).

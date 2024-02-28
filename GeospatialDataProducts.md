@@ -14,7 +14,7 @@ The latest data can be downloaded at:
 
 - GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/latest.geojson
 - KML: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/latest.kml
-- Shapefile: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/latest.shp
+- Shapefile: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/latest.shp.zip
 
 Replace `latest` with `YYYY-MM` to get an older monthly snapshot. For example, `2023-01.geojson`
 contains off-shore wind turbines and platforms that we believe are present as of January 2023.
@@ -66,8 +66,8 @@ The latest data can be downloaded at:
 
 - GeoJSON: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest.geojson
 - KML: https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest.kml
-- Shapefile (wind turbines): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest_wind.shp
-- Shapefile (solar farms): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest_solar.shp
+- Shapefile (wind turbines): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest_wind.shp.zip
+- Shapefile (solar farms): https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/renewable/latest_solar.shp.zip
 
 Replace `latest` with `YYYY-MM` to get an older monthly snapshot. For example, `2023-01.geojson`
 contains wind turbines and solar farms that we believe are present as of January 2023.

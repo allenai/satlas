@@ -1,0 +1,5 @@
+wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-small.tar
+wget https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel2-small.tar
+ls | grep tar | xargs -L 1 tar xvf
+ln -s sentinel2_small sentinel2
+ln -s naip_small naip
