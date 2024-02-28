@@ -24,7 +24,7 @@ The models are released under [ODC-BY](https://github.com/allenai/satlas/blob/ma
 
 The [satlaspretrain_models package](https://github.com/allenai/satlaspretrain_models/) provides an easy way to download and initialize these models so that they can be fine-tuned for downstream applications.
 [This tutorial](https://github.com/allenai/satlaspretrain_models/blob/main/demo.ipynb) details how to use the package to fine-tune a model on EuroSAT.
-
+[This tutorial](https://github.com/allenai/satlaspretrain_models/blob/main/torchgeo_demo.ipynb) shows how to utilize torchgeo to fine-tune a model on UCMerced.
 
 SatlasPretrain Dataset
 ----------------------
