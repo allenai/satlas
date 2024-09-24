@@ -13,5 +13,5 @@ https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-naip-2020.
 https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-dynamic.tar
 https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-labels-static.tar
 https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-metadata.tar
-https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-landsat.tar
-https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/satlas-dataset-v1-sentinel1.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-landsat.tar
+https://ai2-public-datasets.s3.amazonaws.com/satlas/satlas-dataset-v1-sentinel1-new.tar
