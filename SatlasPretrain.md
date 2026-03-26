@@ -1,7 +1,7 @@
 SatlasPretrain: A Large-Scale Dataset for Remote Sensing Image Understanding (ICCV 2023)
 ----------------------------------------------------------------------------------------
 
-[SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf)
+[SatlasPretrain Website](https://satlas-pretrain.allen.ai/) | [Paper](https://arxiv.org/abs/2211.15660) | [Supplementary Material](https://storage.googleapis.com/satlas-explorer-public/SatlasPretrain_supplementary.pdf)
 
 SatlasPretrain is a large-scale pre-training dataset for remote sensing image understanding.
 
@@ -41,7 +41,7 @@ Use e.g. `ls | grep tar | xargs -L 1 tar xvf` to extract the tar files.
 Small versions of the NAIP and Sentinel-2 images [are available](satlaspretrain_urls_small.txt) for testing. These can be used in conjunction with the labels and metadata from the downloads above.
 
 SatlasPretrain includes images and labels from the sources below, re-distributed under the original licenses.
-For a complete breakdown, see pg 4-6 of the [supplementary material](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/SatlasPretrain_supplementary.pdf).
+For a complete breakdown, see pg 4-6 of the [supplementary material](https://storage.googleapis.com/satlas-explorer-public/SatlasPretrain_supplementary.pdf).
 
 - [Sentinel-1, Sentinel-2](https://sentinel.esa.int/web/sentinel/missions) (ESA): see https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
 - [NAIP](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-aerial-photography-national-agriculture-imagery-program-naip) (USGS): public domain
@@ -326,7 +326,7 @@ With visualization:
 
 The code in this repository can also be used to replicate the experiments on downstream datasets. Download the downstream datasets:
 
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain_finetune.tar
+    wget https://storage.googleapis.com/satlas-explorer-public/satlaspretrain_finetune.tar
     tar xvf satlaspretrain_finetune.tar
 
 Example configuration files for 50 training examples are included, e.g.:

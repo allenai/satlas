@@ -73,14 +73,14 @@ In this example we will apply a single-image high-resolution model on a high-res
 If you don't have an image already, [see an example of obtaining one](Normalization.md#high-resolution-images).
 We will assume the image is saved as `image.jpg`.`
 
-We will assume you're using [highres/old_pretrain.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_pretrain.pth) (pre-trained on SatlasPretrain).
+We will assume you're using [highres/old_pretrain.pth](https://storage.googleapis.com/satlas-explorer-public/satlaspretrain/highres/old_pretrain.pth) (pre-trained on SatlasPretrain).
 The expected input is 8-bit RGB image, and input values should be divided by 255 so they are between 0-1.
 
 First, obtain the code and the model:
 
     git clone https://github.com/allenai/satlas
     mkdir -p models/highres
-    wget -O models/highres/old_pretrain.pth https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlaspretrain/highres/old_pretrain.pth
+    wget -O models/highres/old_pretrain.pth https://storage.googleapis.com/satlas-explorer-public/satlaspretrain/highres/old_pretrain.pth
 
 Load the model and apply the model, and extract its building predictions:
 
@@ -141,13 +141,13 @@ In this example we will apply a multi-image multi-band Sentinel-2 model on Senti
 If you don't have Sentinel-2 images merged and normalized for Satlas already, [see the example](Normalization.md#sentinel-2-images).
 The example also documents the normalization of Sentinel-2 bands expected by our models.
 
-We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [sentinel2_swinb_mi_rgb.pth](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_rgb.pth?download=true) (the SatlasPretrain model) instead. The number of expected input images varies by model and is specified under `NumImages` in the corresponding configuration file (see [configs folder](https://github.com/allenai/satlas/tree/main/configs)).
+We will assume you're using the solar farm model ([models/solar_farm/best.pth](https://storage.googleapis.com/satlas-explorer-public/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar)) but you could use another model like [sentinel2_swinb_mi_rgb.pth](https://huggingface.co/allenai/satlas-pretrain/resolve/main/sentinel2_swinb_mi_rgb.pth?download=true) (the SatlasPretrain model) instead. The number of expected input images varies by model and is specified under `NumImages` in the corresponding configuration file (see [configs folder](https://github.com/allenai/satlas/tree/main/configs)).
 
 First obtain the code and the model:
 
     git clone https://github.com/allenai/satlas
     cd satlas
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
+    wget https://storage.googleapis.com/satlas-explorer-public/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
     tar xvf satlas_explorer_datasets_2023-07-24.tar
 
 Now we can load the images, normalize them, and apply the model:

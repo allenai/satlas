@@ -42,7 +42,7 @@ See https://satlas-pretrain.allen.ai/ for more information on SatlasPretrain. Yo
 
 ### Task-Specific Labels and Model Weights
 
-The fine-tuning training data and model weights can be downloaded at https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar.
+The fine-tuning training data and model weights can be downloaded at https://storage.googleapis.com/satlas-explorer-public/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar.
 
 This download link contains an archive with four folders:
 - `base_models/` contains models trained on SatlasPretrain that are used as initialization for fine-tuning.
@@ -50,7 +50,7 @@ This download link contains an archive with four folders:
 - `models/` contains the trained model weights.
 - `splits/` contains metadata about the training and validation splits.
 
-There is also [a smaller (1.5 GB) download](https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_modelsonly_2023-07-24.tar) with just the model weights.
+There is also [a smaller (1.5 GB) download](https://storage.googleapis.com/satlas-explorer-public/satlas_explorer_datasets/satlas_explorer_datasets_modelsonly_2023-07-24.tar) with just the model weights.
 
 See [Using the Code](#using-the-code) below for details on training and applying models.
 
@@ -82,7 +82,7 @@ First clone this repository and extract the training data to a subfolder called 
 
     git clone https://github.com/allenai/satlas
     cd satlas
-    wget https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
+    wget https://storage.googleapis.com/satlas-explorer-public/satlas_explorer_datasets/satlas_explorer_datasets_2023-07-24.tar
     tar xvf satlas_explorer_datasets_2023-07-24.tar
 
 Run training if desired (this will overwrite the models extracted from the tar download):
