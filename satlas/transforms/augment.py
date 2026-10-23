@@ -164,6 +164,15 @@ class Pad(object):
         return self.apply_one(data, targets, pad_to=pad_to)
 
     def apply_one(self, data, targets, pad_to=None):
+        height, width = data.shape[-2:]
+        offset_x = 0
+        offset_y = 0
+        if self.mode == 'center':
+            offset_x = ((pad_to - width + 1) // 2 if width < pad_to
+                else -((width - pad_to) // 2))
+            offset_y = ((pad_to - height + 1) // 2 if height < pad_to
+                else -((height - pad_to) // 2))
+
         def pad(im):
             if len(im.shape) == 2:
                 return pad(im.unsqueeze(0))[0, :, :]
@@ -222,10 +231,11 @@ class Pad(object):
                     continue
 
                 centers = torch.stack([
-                    (target['boxes'][:, 0] + target['boxes'][:, 2]) / 2,
-                    (target['boxes'][:, 1] + target['boxes'][:, 3]) / 2,
+                    (target['boxes'][:, 0] + target['boxes'][:, 2]) / 2 + offset_x,
+                    (target['boxes'][:, 1] + target['boxes'][:, 3]) / 2 + offset_y,
                 ], dim=1)
-                valid_indices = (centers[:, 0] < pad_to) & (centers[:, 1] < pad_to)
+                valid_indices = ((centers[:, 0] >= 0) & (centers[:, 0] < pad_to) &
+                    (centers[:, 1] >= 0) & (centers[:, 1] < pad_to))
 
                 if task['type'] == 'instance':
                     valid_indices &= (target['masks'].amax(dim=[1, 2]) > 0)
@@ -233,6 +243,10 @@ class Pad(object):
 
                 target['boxes'] = target['boxes'][valid_indices, :].contiguous()
                 target['labels'] = target['labels'][valid_indices].contiguous()
+                target['boxes'][:, 0] += offset_x
+                target['boxes'][:, 2] += offset_x
+                target['boxes'][:, 1] += offset_y
+                target['boxes'][:, 3] += offset_y
 
                 # Weird special case.
                 if len(target['boxes']) == 0:
